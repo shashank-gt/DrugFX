@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "title": "Aspirin",
+    "content": "Aspirin is used for pain relief and fever reduction. Side effects include nausea and stomach pain. Standard dosage is 500mg. Warning: Do not take with alcohol. May interact with blood thinners."
+  },
+  {
+    "id": 2,
+    "title": "Ibuprofen",
+    "content": "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID) used for treating pain, fever, and inflammation. Dosages range from 200mg to 800mg every 6 to 8 hours."
+  }
+]

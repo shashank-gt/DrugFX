@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "title": "Data Scientist",
+    "content": "A Data Scientist analyzes and interprets complex data. Required skills include Python, Machine Learning, SQL. Salary range in India is \u20b98,00,000 to \u20b920,00,000. Excellent career growth to Lead Data Scientist."
+  },
+  {
+    "id": 2,
+    "title": "Software Engineer",
+    "content": "Software Engineers design and build applications. Skills needed: Java, Python, C++, React. Good work-life balance depending on the company. Typical salaries are \u20b96,00,000 to \u20b915,00,000."
+  }
+]

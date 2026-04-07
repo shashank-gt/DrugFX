@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analyzer Pro</title>
+    <!-- Modern Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>AI Analyzer <span class="highlight">Pro</span></h1>
+            <p>Advanced RAG-powered intelligence for Medical and Career insights.</p>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Left Panel: Controls -->
+            <section class="controls glass-panel">
+                <div class="control-group">
+                    <label>Select Module</label>
+                    <div class="toggle-container">
+                        <input type="radio" id="module-drug" name="module" value="drug" checked>
+                        <input type="radio" id="module-job" name="module" value="job">
+                        <div class="toggle-slider"></div>
+                        <label for="module-drug" class="toggle-label font-medium"><span class="icon">💊</span> Drug Analysis</label>
+                        <label for="module-job" class="toggle-label font-medium"><span class="icon">💼</span> Job Analysis</label>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Analysis Input Type</label>
+                    <div class="tabs">
+                        <button class="tab-btn active" data-target="text-input">✍️ Text / Query</button>
+                        <button class="tab-btn" data-target="image-input">🖼️ Upload Image</button>
+                    </div>
+                </div>
+
+                <!-- Input Forms -->
+                <div class="input-sections">
+                    <form id="text-form" class="input-form active">
+                        <textarea id="text-input" placeholder="E.g., Aspirin, or 'Senior Data Scientist skilled in Python'..." required></textarea>
+                        <button type="submit" class="submit-btn" id="analyze-text-btn">
+                            <span>Analyze Context</span>
+                            <div class="loader-spinner"></div>
+                        </button>
+                    </form>
+
+                    <form id="image-form" class="input-form">
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="image-input" accept="image/*" required>
+                            <div class="upload-placeholder">
+                                <span class="upload-icon">📁</span>
+                                <p>Drag & Drop or Click to Browse</p>
+                                <span class="file-name" id="selected-file-name">No file selected</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn" id="analyze-image-btn">
+                            <span>Extract & Analyze</span>
+                            <div class="loader-spinner"></div>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Right Panel: Results -->
+            <section class="results glass-panel">
+                <div class="results-header">
+                    <h2>Analysis Results</h2>
+                    <span class="status-badge" id="status-badge">Awaiting Input...</span>
+                </div>
+                
+                <div class="results-content scrollbar-custom" id="results-display">
+                    <!-- Dynamic Content Injected Here by JS -->
+                    <div class="empty-state">
+                        <span class="empty-icon">✨</span>
+                        <p>Submit a query to generate AI-driven insights.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
