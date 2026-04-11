@@ -1,0 +1,25 @@
+# DrugFX Requirements
+# Install with: pip install -r requirements.txt
+
+# --- Web Framework ---
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+
+# --- AI / LLM ---
+google-genai>=0.5.0
+
+# --- RAG / Vector Search ---
+# Optional but improves search quality:
+# faiss-cpu>=1.7.4
+# sentence-transformers>=2.6.0
+
+# --- OCR ---
+# Optional but enables local Tesseract OCR:
+# pytesseract>=0.3.10
+# Pillow>=10.0.0
+
+# --- Utilities ---
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+numpy>=1.24.0

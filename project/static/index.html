@@ -1,93 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Analyzer Pro</title>
-    <!-- Modern Font: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DrugFX — AI Drug Intelligence</title>
+  <meta name="description" content="DrugFX uses cutting-edge AI agents to analyze drug labels and provide comprehensive pharmaceutical intelligence including side effects, dosage, warnings, and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css?v=2" />
 </head>
 <body>
-    <!-- Background Elements -->
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
 
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <h1>AI Analyzer <span class="highlight">Pro</span></h1>
-            <p>Advanced RAG-powered intelligence for Medical and Career insights.</p>
-        </header>
+  <!-- Animated Background -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="noise-overlay"></div>
 
-        <!-- Main Workspace -->
-        <main class="workspace">
-            <!-- Left Panel: Controls -->
-            <section class="controls glass-panel">
-                <div class="control-group">
-                    <label>Select Module</label>
-                    <div class="toggle-container">
-                        <input type="radio" id="module-drug" name="module" value="drug" checked>
-                        <input type="radio" id="module-job" name="module" value="job">
-                        <div class="toggle-slider"></div>
-                        <label for="module-drug" class="toggle-label font-medium"><span class="icon">💊</span> Drug Analysis</label>
-                        <label for="module-job" class="toggle-label font-medium"><span class="icon">💼</span> Job Analysis</label>
-                    </div>
+  <!-- App Shell -->
+  <div class="app-shell">
+
+    <!-- ── HEADER ───────────────────────────────────── -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="logo-wrap">
+          <div class="logo-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="8" fill="url(#logoGrad)"/>
+              <path d="M10 16h12M16 10v12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="16" cy="16" r="5" stroke="white" stroke-width="2"/>
+              <defs>
+                <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#6366f1"/>
+                  <stop offset="1" stop-color="#a855f7"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <span class="logo-brand">Drug<span class="logo-fx">FX</span></span>
+            <span class="logo-tag">AI Drug Intelligence</span>
+          </div>
+        </div>
+        <div class="header-badges">
+          <span class="hbadge hbadge--ai">✦ AI Agent</span>
+          <span class="hbadge hbadge--rag">◈ RAG Powered</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── MAIN ────────────────────────────────────── -->
+    <main class="app-main">
+
+      <!-- LEFT PANEL: Input -->
+      <aside class="panel panel--input glass">
+
+        <div class="panel-title">
+          <span class="pt-icon">⌖</span>
+          <span>Analysis Input</span>
+        </div>
+
+        <div class="mode-switcher" role="tablist">
+          <button class="mode-btn active" id="btn-text" role="tab" aria-selected="true" aria-controls="form-text" data-mode="text">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+            Text Query
+          </button>
+          <button class="mode-btn" id="btn-image" role="tab" aria-selected="false" aria-controls="form-image" data-mode="image">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
+            Scan Label
+          </button>
+        </div>
+
+        <!-- TEXT FORM -->
+        <form id="form-text" class="input-form visible" autocomplete="off">
+          <label for="text-input" class="field-label">Drug Name or Description</label>
+          <div class="textarea-wrap">
+            <textarea
+              id="text-input"
+              name="text"
+              placeholder="e.g. Aspirin 500mg, Metformin, Ibuprofen tablets..."
+              rows="5"
+              required
+            ></textarea>
+            <div class="textarea-glow"></div>
+          </div>
+          <p class="field-hint">Enter any drug name, generic name, or paste label text.</p>
+          <button type="submit" class="btn-analyze" id="btn-analyze-text">
+            <span class="btn-label">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              Analyze with AI
+            </span>
+            <span class="btn-loading">
+              <span class="spinner"></span>
+              Analyzing...
+            </span>
+          </button>
+        </form>
+
+        <!-- IMAGE FORM -->
+        <form id="form-image" class="input-form hidden" enctype="multipart/form-data">
+          <label class="field-label">Upload Drug Label Image</label>
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="image-input" name="file" accept="image/*" required />
+            <div class="upload-content" id="upload-content">
+              <div class="upload-icon-wrap">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="48" height="48" rx="12" fill="rgba(99,102,241,0.1)"/>
+                  <path d="M24 14v12M24 14l-4 4M24 14l4 4" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M14 30v2a2 2 0 002 2h16a2 2 0 002-2v-2" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <p class="upload-text">Drop image here or <span class="upload-link">browse</span></p>
+              <p class="upload-hint">Supports JPG, PNG, WEBP — drug labels, medicine strips</p>
+            </div>
+            <div class="upload-preview hidden" id="upload-preview">
+              <img id="preview-img" src="#" alt="Preview" />
+              <div class="preview-info">
+                <span class="preview-name" id="preview-name">filename.jpg</span>
+                <button type="button" class="preview-clear" id="preview-clear">✕ Clear</button>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn-analyze" id="btn-analyze-image">
+            <span class="btn-label">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
+              Extract &amp; Analyze
+            </span>
+            <span class="btn-loading">
+              <span class="spinner"></span>
+              Processing...
+            </span>
+          </button>
+        </form>
+
+        <!-- Model Info -->
+        <div class="model-info">
+          <div class="model-chip">
+            <span class="model-dot"></span>
+            <span>Gemini 2.0 Flash</span>
+          </div>
+          <span class="model-sep">·</span>
+          <div class="model-chip">
+            <span class="model-dot model-dot--green"></span>
+            <span>RAG Active</span>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- RIGHT PANEL: Results -->
+      <section class="panel panel--results glass" id="results-panel">
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state">
+          <div class="empty-pulse">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring pulse-ring--2"></div>
+            <div class="empty-icon-inner">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4 2"/><path d="M20 12v8M20 24v2" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <h3 class="empty-title">Ready to Analyze</h3>
+          <p class="empty-desc">Enter a drug name or upload a label image to get comprehensive AI-powered pharmaceutical insights.</p>
+          <div class="empty-features">
+            <div class="ef-item"><span>✦</span> Side effect synopsis</div>
+            <div class="ef-item"><span>◈</span> Key warnings &amp; interactions</div>
+            <div class="ef-item"><span>⊕</span> Label data extraction</div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state hidden" id="loading-state">
+          <div class="loading-orb"></div>
+          <div class="loading-text">
+            <h3>AI Agent Processing</h3>
+            <div class="loading-steps" id="loading-steps">
+              <div class="ls-item active" id="ls-1">
+                <span class="ls-dot"></span>
+                <span>Parsing input...</span>
+              </div>
+              <div class="ls-item" id="ls-2">
+                <span class="ls-dot"></span>
+                <span>Retrieving knowledge base...</span>
+              </div>
+              <div class="ls-item" id="ls-3">
+                <span class="ls-dot"></span>
+                <span>Generating analysis...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Content -->
+        <div class="results-wrap hidden" id="results-wrap">
+
+          <!-- Drug Header -->
+          <div class="drug-header" id="drug-header">
+            <div class="drug-header-main">
+              <div class="drug-icon-wrap">
+                <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="url(#dh)"/><path d="M16 8v16M8 16h16" stroke="white" stroke-width="2.5" stroke-linecap="round"/><defs><linearGradient id="dh" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs></svg>
+              </div>
+              <div>
+                <h2 class="drug-name" id="drug-name">Drug Name</h2>
+                <div class="result-badges" id="result-badges">
+                  <span class="rbadge rbadge--success" id="status-badge">Analysis Complete</span>
                 </div>
+              </div>
+            </div>
+            <button class="btn-copy" id="btn-copy" title="Copy results">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z"/><path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"/></svg>
+            </button>
+          </div>
 
-                <div class="control-group">
-                    <label>Analysis Input Type</label>
-                    <div class="tabs">
-                        <button class="tab-btn active" data-target="text-input">✍️ Text / Query</button>
-                        <button class="tab-btn" data-target="image-input">🖼️ Upload Image</button>
-                    </div>
-                </div>
+          <!-- Results Scroll Area -->
+          <div class="results-scroll" id="results-scroll">
 
-                <!-- Input Forms -->
-                <div class="input-sections">
-                    <form id="text-form" class="input-form active">
-                        <textarea id="text-input" placeholder="E.g., Aspirin, or 'Senior Data Scientist skilled in Python'..." required></textarea>
-                        <button type="submit" class="submit-btn" id="analyze-text-btn">
-                            <span>Analyze Context</span>
-                            <div class="loader-spinner"></div>
-                        </button>
-                    </form>
+            <!-- OCR Extracted Text (image only) -->
+            <div class="result-section hidden" id="section-ocr">
+              <div class="section-header sh--info">
+                <span class="sh-icon">◉</span>
+                <span class="sh-title">OCR Extracted Label Text</span>
+              </div>
+              <div class="ocr-text-box" id="ocr-text"></div>
+            </div>
 
-                    <form id="image-form" class="input-form">
-                        <div class="file-upload-wrapper">
-                            <input type="file" id="image-input" accept="image/*" required>
-                            <div class="upload-placeholder">
-                                <span class="upload-icon">📁</span>
-                                <p>Drag & Drop or Click to Browse</p>
-                                <span class="file-name" id="selected-file-name">No file selected</span>
-                            </div>
-                        </div>
-                        <button type="submit" class="submit-btn" id="analyze-image-btn">
-                            <span>Extract & Analyze</span>
-                            <div class="loader-spinner"></div>
-                        </button>
-                    </form>
-                </div>
-            </section>
+            <!-- Label Metadata (MFG / Exp / Batch) -->
+            <div class="result-section hidden" id="section-meta">
+              <div class="section-header sh--meta">
+                <span class="sh-icon">⊕</span>
+                <span class="sh-title">Label Information</span>
+              </div>
+              <div class="meta-grid" id="meta-grid"></div>
+            </div>
 
-            <!-- Right Panel: Results -->
-            <section class="results glass-panel">
-                <div class="results-header">
-                    <h2>Analysis Results</h2>
-                    <span class="status-badge" id="status-badge">Awaiting Input...</span>
-                </div>
-                
-                <div class="results-content scrollbar-custom" id="results-display">
-                    <!-- Dynamic Content Injected Here by JS -->
-                    <div class="empty-state">
-                        <span class="empty-icon">✨</span>
-                        <p>Submit a query to generate AI-driven insights.</p>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
+            <!-- Synopsis -->
+            <div class="result-section" id="section-synopsis">
+              <div class="section-header sh--purple">
+                <span class="sh-icon">✦</span>
+                <span class="sh-title">Drug Synopsis</span>
+              </div>
+              <div class="synopsis-card" id="synopsis-text"></div>
+            </div>
 
-    <script src="/static/app.js"></script>
+            <!-- Key Side Effects (Critical) -->
+            <div class="result-section" id="section-key-se">
+              <div class="section-header sh--danger">
+                <span class="sh-icon">⚠</span>
+                <span class="sh-title">Critical Side Effects</span>
+              </div>
+              <div class="key-se-grid" id="key-se-grid"></div>
+            </div>
+
+            <!-- Full Side Effects -->
+            <div class="result-section" id="section-se">
+              <div class="section-header sh--orange">
+                <span class="sh-icon">◈</span>
+                <span class="sh-title">All Side Effects</span>
+              </div>
+              <ul class="effect-list" id="se-list"></ul>
+            </div>
+
+            <!-- Uses -->
+            <div class="result-section" id="section-uses">
+              <div class="section-header sh--green">
+                <span class="sh-icon">✓</span>
+                <span class="sh-title">Therapeutic Uses</span>
+              </div>
+              <ul class="effect-list effect-list--uses" id="uses-list"></ul>
+            </div>
+
+            <!-- Dosage -->
+            <div class="result-section" id="section-dosage">
+              <div class="section-header sh--blue">
+                <span class="sh-icon">⊗</span>
+                <span class="sh-title">Dosage &amp; Administration</span>
+              </div>
+              <div class="dosage-card" id="dosage-text"></div>
+            </div>
+
+            <!-- Warnings -->
+            <div class="result-section" id="section-warnings">
+              <div class="section-header sh--warning">
+                <span class="sh-icon">🛑</span>
+                <span class="sh-title">Warnings &amp; Precautions</span>
+              </div>
+              <ul class="warn-list" id="warn-list"></ul>
+            </div>
+
+            <!-- Drug Interactions -->
+            <div class="result-section" id="section-interactions">
+              <div class="section-header sh--teal">
+                <span class="sh-icon">⇄</span>
+                <span class="sh-title">Drug Interactions</span>
+              </div>
+              <div class="tag-cloud" id="interactions-tags"></div>
+            </div>
+
+            <!-- Alternatives -->
+            <div class="result-section" id="section-alternatives">
+              <div class="section-header sh--indigo">
+                <span class="sh-icon">↔</span>
+                <span class="sh-title">Alternatives</span>
+              </div>
+              <div class="tag-cloud" id="alternatives-tags"></div>
+            </div>
+
+            <!-- Medical Disclaimer -->
+            <div class="disclaimer-bar">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+              <span>This is AI-generated information for educational purposes only. Always consult a qualified medical professional before taking any medication.</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div class="error-state hidden" id="error-state">
+          <div class="error-icon">✕</div>
+          <h3 class="error-title">Analysis Failed</h3>
+          <p class="error-msg" id="error-msg">An unexpected error occurred.</p>
+          <button class="btn-retry" id="btn-retry">Try Again</button>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
 </body>
 </html>

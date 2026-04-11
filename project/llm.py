@@ -1,12 +1,12 @@
+"""
+DrugFX LLM Module — kept for backward compatibility.
+The main inference is now handled by agent.py.
+"""
 import os
 import json
-from typing import Optional
+import logging
 
-try:
-    from openai import OpenAI
-    HAS_OPENAI_LIB = True
-except ImportError:
-    HAS_OPENAI_LIB = False
+logger = logging.getLogger(__name__)
 
 try:
     from dotenv import load_dotenv
@@ -14,49 +14,53 @@ try:
 except ImportError:
     pass
 
-# Initialize OpenAI client if API key is available
-api_key = os.environ.get("OPENAI_API_KEY")
-client = OpenAI(api_key=api_key) if HAS_OPENAI_LIB and api_key else None
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+gemini_client = None
+genai_types = None
 
-def generate_response(prompt: str, system_prompt: str = "You are a helpful AI assistant.", model: str = "gpt-3.5-turbo", response_format: str = "text") -> str:
+try:
+    from google import genai
+    from google.genai import types as _types
+    genai_types = _types
+    if GEMINI_API_KEY and GEMINI_API_KEY not in ("your_gemini_api_key_here", ""):
+        gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+        logger.info("LLM: Gemini client initialized.")
+    else:
+        logger.warning("LLM: GEMINI_API_KEY not set.")
+except ImportError:
+    logger.warning("LLM: google-genai not installed.")
+
+
+def generate_response(prompt: str, system_prompt: str = "You are a medical AI assistant.",
+                      model: str = "gemini-2.0-flash", response_format: str = "text") -> str:
     """
-    Sends a prompt to the LLM and returns the response.
-    Includes a mock fallback if no API key or openai library is provided.
+    Sends a prompt to Google Gemini and returns the text response.
+    Falls back to mock JSON if the client is not available.
     """
-    if not client:
-        print("WARNING: OPENAI_API_KEY not found or openai library missing. Using mock LLM response.")
-        if "drug" in system_prompt.lower() or "drug" in prompt.lower():
-            return json.dumps({
-                "uses": ["Pain relief", "Fever reduction"],
-                "side_effects": ["Nausea", "Dizziness"],
-                "dosage": "500mg every 4-6 hours",
-                "warnings": ["Consult a medical professional before use", "Do not take with alcohol"],
-                "drug_interactions": ["Blood thinners"],
-                "alternatives": ["Ibuprofen", "Naproxen"]
-            }, indent=2)
-        elif "job" in system_prompt.lower() or "job" in prompt.lower():
-            return json.dumps({
-                "required_skills": ["Python", "Machine Learning", "Communication"],
-                "responsibilities": ["Develop AI models", "Deploy to production"],
-                "salary_range": "\u20b910,00,000 - \u20b925,00,000",
-                "career_growth": "AI Engineer -> Lead AI Engineer -> AI Architect",
-                "work_life_balance": "Generally good, remote options available"
-            }, indent=2)
-        return json.dumps({"result": "Mock LLM Response"})
+    if not gemini_client:
+        logger.warning("LLM: No Gemini client — returning mock.")
+        return json.dumps({
+            "uses": ["Pain relief", "Fever reduction"],
+            "side_effects": ["Nausea", "Dizziness"],
+            "dosage": "As prescribed by your doctor",
+            "warnings": ["Consult a medical professional before use"],
+            "drug_interactions": ["Warfarin", "Alcohol"],
+            "alternatives": ["Ibuprofen", "Paracetamol"]
+        })
 
     try:
-        kwargs = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
-            ]
-        }
-        if response_format == "json_object":
-            kwargs["response_format"] = {"type": "json_object"}
+        full_prompt = f"{system_prompt}\n\n{prompt}"
+        config_kwargs = {}
+        if response_format == "json_object" and genai_types:
+            config_kwargs["response_mime_type"] = "application/json"
 
-        response = client.chat.completions.create(**kwargs)
-        return response.choices[0].message.content
+        cfg = genai_types.GenerateContentConfig(**config_kwargs) if config_kwargs and genai_types else None
+        response = gemini_client.models.generate_content(
+            model=model,
+            contents=full_prompt,
+            config=cfg
+        )
+        return response.text
     except Exception as e:
-        print(f"Error calling LLM: {e}")
-        return "{}"
+        logger.error(f"LLM: Gemini call failed: {e}")
+        return json.dumps({"error": str(e)})

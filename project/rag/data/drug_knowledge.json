@@ -1,12 +1,77 @@
 [
   {
     "id": 1,
-    "title": "Aspirin",
-    "content": "Aspirin is used for pain relief and fever reduction. Side effects include nausea and stomach pain. Standard dosage is 500mg. Warning: Do not take with alcohol. May interact with blood thinners."
+    "title": "Aspirin (Acetylsalicylic Acid)",
+    "content": "Aspirin is a salicylate drug used to treat pain, fever, and inflammation. Also used as a blood thinner to prevent heart attacks and strokes. Standard dosage: 325-650mg every 4-6 hours for pain. Low-dose (81mg) for cardiac protection. Side effects: stomach upset, nausea, heartburn, bleeding risk, tinnitus at high doses. Warnings: avoid in children under 12 (Reye syndrome risk), do not take with alcohol, avoid before surgery. Interactions: warfarin, ibuprofen, other NSAIDs, antidepressants. Alternatives: acetaminophen, ibuprofen, naproxen."
   },
   {
     "id": 2,
-    "title": "Ibuprofen",
-    "content": "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID) used for treating pain, fever, and inflammation. Dosages range from 200mg to 800mg every 6 to 8 hours."
+    "title": "Ibuprofen (Advil, Motrin)",
+    "content": "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID) for treating pain, fever, and inflammation including arthritis, menstrual cramps, injuries. Dosages: 200-800mg every 6-8 hours, max 3200mg/day. Side effects: stomach pain, nausea, heartburn, kidney issues with long-term use, increased blood pressure, risk of cardiovascular events. Warnings: take with food, avoid if history of stomach ulcers, use lowest dose for shortest duration. Interactions: aspirin, blood thinners, lithium, ACE inhibitors. Alternatives: acetaminophen, naproxen, celecoxib."
+  },
+  {
+    "id": 3,
+    "title": "Paracetamol / Acetaminophen (Tylenol, Calpol)",
+    "content": "Paracetamol is an analgesic and antipyretic used to relieve mild to moderate pain and reduce fever. Does not have significant anti-inflammatory effects. Adult dosage: 500-1000mg every 4-6 hours, max 4000mg/day (3000mg if elderly or liver issues). Side effects: generally well-tolerated; overdose causes severe liver damage. Warnings: avoid alcohol, do not exceed recommended dose, caution in liver disease. Interactions: warfarin, isoniazid, alcohol. Alternatives: ibuprofen, aspirin, diclofenac."
+  },
+  {
+    "id": 4,
+    "title": "Amoxicillin (Amoxil)",
+    "content": "Amoxicillin is a penicillin-type antibiotic used to treat bacterial infections including ear infections, pneumonia, strep throat, UTIs, and H. pylori. Dosage: 250-500mg three times daily or 875mg twice daily. Side effects: diarrhea, stomach upset, rash, allergic reactions, yeast infections. Warnings: complete the full course even if feeling better, inform doctor of penicillin allergy. Interactions: warfarin, methotrexate, allopurinol, oral contraceptives. Not effective against viral infections."
+  },
+  {
+    "id": 5,
+    "title": "Metformin (Glucophage)",
+    "content": "Metformin is a biguanide diabetes medication used to control high blood sugar in Type 2 diabetes. Works by decreasing hepatic glucose production and improving insulin sensitivity. Dosage: 500-2550mg daily, taken with meals. Side effects: nausea, diarrhea, stomach upset, metallic taste, lactic acidosis (rare but serious), vitamin B12 deficiency. Warnings: hold before CT contrast procedures, avoid in severe kidney disease, increase dose gradually. Interactions: alcohol, iodinated contrast agents, carbonic anhydrase inhibitors."
+  },
+  {
+    "id": 6,
+    "title": "Atorvastatin (Lipitor)",
+    "content": "Atorvastatin is a statin medication to lower LDL cholesterol and triglycerides, reducing cardiovascular disease risk. Dosage: 10-80mg once daily. Side effects: muscle pain/weakness (myopathy), liver enzyme elevation, headache, nausea, joint pain; rare: rhabdomyolysis. Warnings: avoid grapefruit juice, monitor liver function, report unexplained muscle pain or dark urine immediately. Interactions: cyclosporine, clarithromycin, antifungals, gemfibrozil, niacin. Alternatives: rosuvastatin, simvastatin, pravastatin."
+  },
+  {
+    "id": 7,
+    "title": "Omeprazole (Prilosec)",
+    "content": "Omeprazole is a proton pump inhibitor (PPI) that reduces stomach acid production. Used for GERD, peptic ulcers, Zollinger-Ellison syndrome, and H. pylori. Dosage: 20-40mg once daily before meals. Side effects: headache, diarrhea, nausea, abdominal pain, vitamin B12 deficiency, hypomagnesemia with long-term use, increased risk of C. difficile infections. Warnings: may mask signs of gastric cancer, long-term use associated with fracture risk and kidney disease. Interactions: clopidogrel, methotrexate, iron salts, antiretrovirals."
+  },
+  {
+    "id": 8,
+    "title": "Lisinopril (Zestril, Prinivil)",
+    "content": "Lisinopril is an ACE inhibitor used to treat hypertension, heart failure, and protect kidneys in diabetic nephropathy. Dosage: 2.5-40mg once daily. Side effects: dry persistent cough, dizziness, low blood pressure, elevated potassium, kidney function changes, angioedema (rare but serious). Warnings: avoid in pregnancy, monitor kidney function and potassium, stop if angioedema occurs. Interactions: potassium supplements, NSAIDs, diuretics, lithium, aliskiren. Alternatives: losartan (ARB), ramipril, enalapril."
+  },
+  {
+    "id": 9,
+    "title": "Cetirizine (Zyrtec)",
+    "content": "Cetirizine is a second-generation antihistamine for allergic rhinitis, hives, and allergy symptoms. Dosage: 5-10mg once daily. Side effects: drowsiness (less than first-gen), dry mouth, fatigue, dizziness. Less sedating than older antihistamines. Warnings: may still cause drowsiness, avoid alcohol, caution with kidney disease. Interactions: CNS depressants, alcohol, ritonavir. Alternatives: loratadine, fexofenadine, desloratadine."
+  },
+  {
+    "id": 10,
+    "title": "Azithromycin (Zithromax, Z-Pak)",
+    "content": "Azithromycin is a macrolide antibiotic for respiratory infections, STIs, ear infections, and skin infections. Dosage: 500mg day 1, then 250mg days 2-5. Side effects: nausea, vomiting, diarrhea, abdominal pain, QT prolongation (cardiac), hearing changes. Warnings: caution in cardiac arrhythmias, liver disease, and myasthenia gravis; complete full course. Interactions: antacids, warfarin, digoxin, cyclosporine, ergot alkaloids. Alternatives: clarithromycin, doxycycline, amoxicillin."
+  },
+  {
+    "id": 11,
+    "title": "Sertraline (Zoloft)",
+    "content": "Sertraline is an SSRI antidepressant for depression, anxiety, OCD, PTSD, panic disorder, and PMDD. Dosage: 50-200mg once daily. Side effects: nausea, insomnia, diarrhea, sexual dysfunction, dry mouth, sweating, increased anxiety initially, tremor. Serious: serotonin syndrome, suicidal thoughts in young patients. Warnings: do not stop abruptly, takes 2-6 weeks for full effect, monitor mood changes especially early on. Interactions: MAOIs, tramadol, other serotonergic drugs, blood thinners."
+  },
+  {
+    "id": 12,
+    "title": "Metronidazole (Flagyl)",
+    "content": "Metronidazole is an antibiotic/antiprotozoal for bacterial vaginosis, H. pylori, C. difficile, dental infections, and protozoal infections. Dosage: 250-500mg 2-3 times daily. Side effects: metallic taste, nausea, vomiting, headache, dark urine, peripheral neuropathy (long-term). Warnings: avoid alcohol during and 48 hours after treatment (disulfiram-like reaction), caution in liver disease. Interactions: alcohol, warfarin, lithium, cyclosporine, phenytoin."
+  },
+  {
+    "id": 13,
+    "title": "Dexamethasone (Decadron)",
+    "content": "Dexamethasone is a potent corticosteroid for inflammation, allergic reactions, autoimmune diseases, cerebral edema, and COVID-19 severe cases. Dosage varies widely by condition. Side effects: increased blood sugar, weight gain, fluid retention, mood changes, insomnia, increased infection risk, adrenal suppression, osteoporosis (long-term). Warnings: do not stop abruptly after long-term use, may mask signs of infection, increases blood glucose in diabetics. Interactions: NSAIDs, live vaccines, antifungals, rifampin."
+  },
+  {
+    "id": 14,
+    "title": "Pantoprazole (Protonix)",
+    "content": "Pantoprazole is a proton pump inhibitor (PPI) for GERD, erosive esophagitis, and Zollinger-Ellison syndrome. Dosage: 20-40mg once or twice daily. Side effects: headache, diarrhea, nausea, flatulence, hypomagnesemia (long-term), C. difficile risk, bone fractures, vitamin B12 deficiency. Warnings: similar to omeprazole, assess for ongoing need regularly. Interactions: methotrexate, HIV medications, iron, ketoconazole."
+  },
+  {
+    "id": 15,
+    "title": "Ciprofloxacin (Cipro)",
+    "content": "Ciprofloxacin is a fluoroquinolone antibiotic for UTIs, respiratory tract infections, skin infections, anthrax. Dosage: 250-750mg twice daily. Side effects: nausea, diarrhea, dizziness, tendonitis/tendon rupture (especially achilles), photosensitivity, QT prolongation, peripheral neuropathy, CNS effects. Warnings: avoid in pregnancy and growing children, use with caution in elderly, limit sun exposure, avoid with antacids. Interactions: antacids, NSAIDs, theophylline, warfarin, tizanidine."
   }
 ]
