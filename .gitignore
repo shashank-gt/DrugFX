@@ -41,3 +41,7 @@ uploads/
 # Distribution
 *.whl
 *.tar.gz
+
+# Logs
+*.log
+server_log.txt
