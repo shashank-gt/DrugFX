@@ -2,76 +2,251 @@
   {
     "id": 1,
     "title": "Aspirin (Acetylsalicylic Acid)",
-    "content": "Aspirin is a salicylate drug used to treat pain, fever, and inflammation. Also used as a blood thinner to prevent heart attacks and strokes. Standard dosage: 325-650mg every 4-6 hours for pain. Low-dose (81mg) for cardiac protection. Side effects: stomach upset, nausea, heartburn, bleeding risk, tinnitus at high doses. Warnings: avoid in children under 12 (Reye syndrome risk), do not take with alcohol, avoid before surgery. Interactions: warfarin, ibuprofen, other NSAIDs, antidepressants. Alternatives: acetaminophen, ibuprofen, naproxen."
+    "content": "Aspirin is a salicylate drug used to treat pain, fever, and inflammation. Also used as a blood thinner to prevent heart attacks and strokes. Standard dosage: 325-650mg every 4-6 hours for pain. Low-dose (81mg) for cardiac protection. Side effects: stomach upset, nausea, heartburn, bleeding risk, tinnitus at high doses. Warnings: avoid in children under 12 (Reye syndrome risk), do not take with alcohol, avoid before surgery. Interactions: warfarin, ibuprofen, other NSAIDs, antidepressants. Alternatives: acetaminophen, ibuprofen, naproxen. Pregnancy Category D. Store below 25°C."
   },
   {
     "id": 2,
     "title": "Ibuprofen (Advil, Motrin)",
-    "content": "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID) for treating pain, fever, and inflammation including arthritis, menstrual cramps, injuries. Dosages: 200-800mg every 6-8 hours, max 3200mg/day. Side effects: stomach pain, nausea, heartburn, kidney issues with long-term use, increased blood pressure, risk of cardiovascular events. Warnings: take with food, avoid if history of stomach ulcers, use lowest dose for shortest duration. Interactions: aspirin, blood thinners, lithium, ACE inhibitors. Alternatives: acetaminophen, naproxen, celecoxib."
+    "content": "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID) for treating pain, fever, and inflammation including arthritis, menstrual cramps, injuries. Dosages: 200-800mg every 6-8 hours, max 3200mg/day. Side effects: stomach pain, nausea, heartburn, kidney issues with long-term use, increased blood pressure, risk of cardiovascular events. Warnings: take with food, avoid if history of stomach ulcers, use lowest dose for shortest duration. Interactions: aspirin, blood thinners, lithium, ACE inhibitors. Alternatives: acetaminophen, naproxen, celecoxib. Pregnancy Category C (D in third trimester). Store at room temperature."
   },
   {
     "id": 3,
-    "title": "Paracetamol / Acetaminophen (Tylenol, Calpol)",
-    "content": "Paracetamol is an analgesic and antipyretic used to relieve mild to moderate pain and reduce fever. Does not have significant anti-inflammatory effects. Adult dosage: 500-1000mg every 4-6 hours, max 4000mg/day (3000mg if elderly or liver issues). Side effects: generally well-tolerated; overdose causes severe liver damage. Warnings: avoid alcohol, do not exceed recommended dose, caution in liver disease. Interactions: warfarin, isoniazid, alcohol. Alternatives: ibuprofen, aspirin, diclofenac."
+    "title": "Paracetamol / Acetaminophen (Tylenol, Calpol, Dolo)",
+    "content": "Paracetamol is an analgesic and antipyretic used to relieve mild to moderate pain and reduce fever. Does not have significant anti-inflammatory effects. Adult dosage: 500-1000mg every 4-6 hours, max 4000mg/day (3000mg if elderly or liver issues). Side effects: generally well-tolerated; overdose causes severe liver damage. Warnings: avoid alcohol, do not exceed recommended dose, caution in liver disease. Interactions: warfarin, isoniazid, alcohol. Alternatives: ibuprofen, aspirin, diclofenac. Safe in pregnancy when used as directed. Store below 30°C."
   },
   {
     "id": 4,
-    "title": "Amoxicillin (Amoxil)",
-    "content": "Amoxicillin is a penicillin-type antibiotic used to treat bacterial infections including ear infections, pneumonia, strep throat, UTIs, and H. pylori. Dosage: 250-500mg three times daily or 875mg twice daily. Side effects: diarrhea, stomach upset, rash, allergic reactions, yeast infections. Warnings: complete the full course even if feeling better, inform doctor of penicillin allergy. Interactions: warfarin, methotrexate, allopurinol, oral contraceptives. Not effective against viral infections."
+    "title": "Amoxicillin (Amoxil, Mox, Novamox)",
+    "content": "Amoxicillin is a penicillin-type antibiotic used to treat bacterial infections including ear infections, pneumonia, strep throat, UTIs, and H. pylori. Dosage: 250-500mg three times daily or 875mg twice daily. Side effects: diarrhea, stomach upset, rash, allergic reactions, yeast infections. Warnings: complete the full course even if feeling better, inform doctor of penicillin allergy. Interactions: warfarin, methotrexate, allopurinol, oral contraceptives. Not effective against viral infections. Pregnancy Category B. Store in cool dry place."
   },
   {
     "id": 5,
-    "title": "Metformin (Glucophage)",
-    "content": "Metformin is a biguanide diabetes medication used to control high blood sugar in Type 2 diabetes. Works by decreasing hepatic glucose production and improving insulin sensitivity. Dosage: 500-2550mg daily, taken with meals. Side effects: nausea, diarrhea, stomach upset, metallic taste, lactic acidosis (rare but serious), vitamin B12 deficiency. Warnings: hold before CT contrast procedures, avoid in severe kidney disease, increase dose gradually. Interactions: alcohol, iodinated contrast agents, carbonic anhydrase inhibitors."
+    "title": "Metformin (Glucophage, Glycomet)",
+    "content": "Metformin is a biguanide diabetes medication used to control high blood sugar in Type 2 diabetes. Works by decreasing hepatic glucose production and improving insulin sensitivity. Dosage: 500-2550mg daily, taken with meals. Side effects: nausea, diarrhea, stomach upset, metallic taste, lactic acidosis (rare but serious), vitamin B12 deficiency. Warnings: hold before CT contrast procedures, avoid in severe kidney disease, increase dose gradually. Interactions: alcohol, iodinated contrast agents, carbonic anhydrase inhibitors. Pregnancy Category B. Store at room temperature."
   },
   {
     "id": 6,
-    "title": "Atorvastatin (Lipitor)",
-    "content": "Atorvastatin is a statin medication to lower LDL cholesterol and triglycerides, reducing cardiovascular disease risk. Dosage: 10-80mg once daily. Side effects: muscle pain/weakness (myopathy), liver enzyme elevation, headache, nausea, joint pain; rare: rhabdomyolysis. Warnings: avoid grapefruit juice, monitor liver function, report unexplained muscle pain or dark urine immediately. Interactions: cyclosporine, clarithromycin, antifungals, gemfibrozil, niacin. Alternatives: rosuvastatin, simvastatin, pravastatin."
+    "title": "Atorvastatin (Lipitor, Atorva)",
+    "content": "Atorvastatin is a statin medication to lower LDL cholesterol and triglycerides, reducing cardiovascular disease risk. Dosage: 10-80mg once daily. Side effects: muscle pain/weakness (myopathy), liver enzyme elevation, headache, nausea, joint pain; rare: rhabdomyolysis. Warnings: avoid grapefruit juice, monitor liver function, report unexplained muscle pain or dark urine immediately. Interactions: cyclosporine, clarithromycin, antifungals, gemfibrozil, niacin. Alternatives: rosuvastatin, simvastatin, pravastatin. Pregnancy Category X — contraindicated. Store at room temperature."
   },
   {
     "id": 7,
-    "title": "Omeprazole (Prilosec)",
-    "content": "Omeprazole is a proton pump inhibitor (PPI) that reduces stomach acid production. Used for GERD, peptic ulcers, Zollinger-Ellison syndrome, and H. pylori. Dosage: 20-40mg once daily before meals. Side effects: headache, diarrhea, nausea, abdominal pain, vitamin B12 deficiency, hypomagnesemia with long-term use, increased risk of C. difficile infections. Warnings: may mask signs of gastric cancer, long-term use associated with fracture risk and kidney disease. Interactions: clopidogrel, methotrexate, iron salts, antiretrovirals."
+    "title": "Omeprazole (Prilosec, Omez)",
+    "content": "Omeprazole is a proton pump inhibitor (PPI) that reduces stomach acid production. Used for GERD, peptic ulcers, Zollinger-Ellison syndrome, and H. pylori. Dosage: 20-40mg once daily before meals. Side effects: headache, diarrhea, nausea, abdominal pain, vitamin B12 deficiency, hypomagnesemia with long-term use, increased risk of C. difficile infections. Warnings: may mask signs of gastric cancer, long-term use associated with fracture risk and kidney disease. Interactions: clopidogrel, methotrexate, iron salts, antiretrovirals. Pregnancy Category C. Store below 25°C."
   },
   {
     "id": 8,
     "title": "Lisinopril (Zestril, Prinivil)",
-    "content": "Lisinopril is an ACE inhibitor used to treat hypertension, heart failure, and protect kidneys in diabetic nephropathy. Dosage: 2.5-40mg once daily. Side effects: dry persistent cough, dizziness, low blood pressure, elevated potassium, kidney function changes, angioedema (rare but serious). Warnings: avoid in pregnancy, monitor kidney function and potassium, stop if angioedema occurs. Interactions: potassium supplements, NSAIDs, diuretics, lithium, aliskiren. Alternatives: losartan (ARB), ramipril, enalapril."
+    "content": "Lisinopril is an ACE inhibitor used to treat hypertension, heart failure, and protect kidneys in diabetic nephropathy. Dosage: 2.5-40mg once daily. Side effects: dry persistent cough, dizziness, low blood pressure, elevated potassium, kidney function changes, angioedema (rare but serious). Warnings: avoid in pregnancy, monitor kidney function and potassium, stop if angioedema occurs. Interactions: potassium supplements, NSAIDs, diuretics, lithium, aliskiren. Alternatives: losartan (ARB), ramipril, enalapril. Pregnancy Category D. Store at room temperature."
   },
   {
     "id": 9,
-    "title": "Cetirizine (Zyrtec)",
-    "content": "Cetirizine is a second-generation antihistamine for allergic rhinitis, hives, and allergy symptoms. Dosage: 5-10mg once daily. Side effects: drowsiness (less than first-gen), dry mouth, fatigue, dizziness. Less sedating than older antihistamines. Warnings: may still cause drowsiness, avoid alcohol, caution with kidney disease. Interactions: CNS depressants, alcohol, ritonavir. Alternatives: loratadine, fexofenadine, desloratadine."
+    "title": "Cetirizine (Zyrtec, Cetzine)",
+    "content": "Cetirizine is a second-generation antihistamine for allergic rhinitis, hives, and allergy symptoms. Dosage: 5-10mg once daily. Side effects: drowsiness (less than first-gen), dry mouth, fatigue, dizziness. Less sedating than older antihistamines. Warnings: may still cause drowsiness, avoid alcohol, caution with kidney disease. Interactions: CNS depressants, alcohol, ritonavir. Alternatives: loratadine, fexofenadine, desloratadine. Pregnancy Category B. Store at room temperature."
   },
   {
     "id": 10,
-    "title": "Azithromycin (Zithromax, Z-Pak)",
-    "content": "Azithromycin is a macrolide antibiotic for respiratory infections, STIs, ear infections, and skin infections. Dosage: 500mg day 1, then 250mg days 2-5. Side effects: nausea, vomiting, diarrhea, abdominal pain, QT prolongation (cardiac), hearing changes. Warnings: caution in cardiac arrhythmias, liver disease, and myasthenia gravis; complete full course. Interactions: antacids, warfarin, digoxin, cyclosporine, ergot alkaloids. Alternatives: clarithromycin, doxycycline, amoxicillin."
+    "title": "Azithromycin (Zithromax, Azee, Z-Pak)",
+    "content": "Azithromycin is a macrolide antibiotic for respiratory infections, STIs, ear infections, and skin infections. Dosage: 500mg day 1, then 250mg days 2-5. Side effects: nausea, vomiting, diarrhea, abdominal pain, QT prolongation (cardiac), hearing changes. Warnings: caution in cardiac arrhythmias, liver disease, and myasthenia gravis; complete full course. Interactions: antacids, warfarin, digoxin, cyclosporine, ergot alkaloids. Alternatives: clarithromycin, doxycycline, amoxicillin. Pregnancy Category B. Store below 30°C."
   },
   {
     "id": 11,
     "title": "Sertraline (Zoloft)",
-    "content": "Sertraline is an SSRI antidepressant for depression, anxiety, OCD, PTSD, panic disorder, and PMDD. Dosage: 50-200mg once daily. Side effects: nausea, insomnia, diarrhea, sexual dysfunction, dry mouth, sweating, increased anxiety initially, tremor. Serious: serotonin syndrome, suicidal thoughts in young patients. Warnings: do not stop abruptly, takes 2-6 weeks for full effect, monitor mood changes especially early on. Interactions: MAOIs, tramadol, other serotonergic drugs, blood thinners."
+    "content": "Sertraline is an SSRI antidepressant for depression, anxiety, OCD, PTSD, panic disorder, and PMDD. Dosage: 50-200mg once daily. Side effects: nausea, insomnia, diarrhea, sexual dysfunction, dry mouth, sweating, increased anxiety initially, tremor. Serious: serotonin syndrome, suicidal thoughts in young patients. Warnings: do not stop abruptly, takes 2-6 weeks for full effect, monitor mood changes especially early on. Interactions: MAOIs, tramadol, other serotonergic drugs, blood thinners. Pregnancy Category C."
   },
   {
     "id": 12,
-    "title": "Metronidazole (Flagyl)",
-    "content": "Metronidazole is an antibiotic/antiprotozoal for bacterial vaginosis, H. pylori, C. difficile, dental infections, and protozoal infections. Dosage: 250-500mg 2-3 times daily. Side effects: metallic taste, nausea, vomiting, headache, dark urine, peripheral neuropathy (long-term). Warnings: avoid alcohol during and 48 hours after treatment (disulfiram-like reaction), caution in liver disease. Interactions: alcohol, warfarin, lithium, cyclosporine, phenytoin."
+    "title": "Metronidazole (Flagyl, Metrogyl)",
+    "content": "Metronidazole is an antibiotic/antiprotozoal for bacterial vaginosis, H. pylori, C. difficile, dental infections, and protozoal infections. Dosage: 250-500mg 2-3 times daily. Side effects: metallic taste, nausea, vomiting, headache, dark urine, peripheral neuropathy (long-term). Warnings: avoid alcohol during and 48 hours after treatment (disulfiram-like reaction), caution in liver disease. Interactions: alcohol, warfarin, lithium, cyclosporine, phenytoin. Pregnancy Category B (contraindicated in first trimester). Store below 25°C."
   },
   {
     "id": 13,
-    "title": "Dexamethasone (Decadron)",
-    "content": "Dexamethasone is a potent corticosteroid for inflammation, allergic reactions, autoimmune diseases, cerebral edema, and COVID-19 severe cases. Dosage varies widely by condition. Side effects: increased blood sugar, weight gain, fluid retention, mood changes, insomnia, increased infection risk, adrenal suppression, osteoporosis (long-term). Warnings: do not stop abruptly after long-term use, may mask signs of infection, increases blood glucose in diabetics. Interactions: NSAIDs, live vaccines, antifungals, rifampin."
+    "title": "Dexamethasone (Decadron, Dexona)",
+    "content": "Dexamethasone is a potent corticosteroid for inflammation, allergic reactions, autoimmune diseases, cerebral edema, and COVID-19 severe cases. Dosage varies widely by condition. Side effects: increased blood sugar, weight gain, fluid retention, mood changes, insomnia, increased infection risk, adrenal suppression, osteoporosis (long-term). Warnings: do not stop abruptly after long-term use, may mask signs of infection, increases blood glucose in diabetics. Interactions: NSAIDs, live vaccines, antifungals, rifampin. Pregnancy Category C."
   },
   {
     "id": 14,
-    "title": "Pantoprazole (Protonix)",
-    "content": "Pantoprazole is a proton pump inhibitor (PPI) for GERD, erosive esophagitis, and Zollinger-Ellison syndrome. Dosage: 20-40mg once or twice daily. Side effects: headache, diarrhea, nausea, flatulence, hypomagnesemia (long-term), C. difficile risk, bone fractures, vitamin B12 deficiency. Warnings: similar to omeprazole, assess for ongoing need regularly. Interactions: methotrexate, HIV medications, iron, ketoconazole."
+    "title": "Pantoprazole (Protonix, Pan, Pantocid)",
+    "content": "Pantoprazole is a proton pump inhibitor (PPI) for GERD, erosive esophagitis, and Zollinger-Ellison syndrome. Dosage: 20-40mg once or twice daily. Side effects: headache, diarrhea, nausea, flatulence, hypomagnesemia (long-term), C. difficile risk, bone fractures, vitamin B12 deficiency. Warnings: similar to omeprazole, assess for ongoing need regularly. Interactions: methotrexate, HIV medications, iron, ketoconazole. Pregnancy Category B. Store at room temperature protected from moisture."
   },
   {
     "id": 15,
-    "title": "Ciprofloxacin (Cipro)",
-    "content": "Ciprofloxacin is a fluoroquinolone antibiotic for UTIs, respiratory tract infections, skin infections, anthrax. Dosage: 250-750mg twice daily. Side effects: nausea, diarrhea, dizziness, tendonitis/tendon rupture (especially achilles), photosensitivity, QT prolongation, peripheral neuropathy, CNS effects. Warnings: avoid in pregnancy and growing children, use with caution in elderly, limit sun exposure, avoid with antacids. Interactions: antacids, NSAIDs, theophylline, warfarin, tizanidine."
+    "title": "Ciprofloxacin (Cipro, Ciplox)",
+    "content": "Ciprofloxacin is a fluoroquinolone antibiotic for UTIs, respiratory tract infections, skin infections, anthrax. Dosage: 250-750mg twice daily. Side effects: nausea, diarrhea, dizziness, tendonitis/tendon rupture (especially achilles), photosensitivity, QT prolongation, peripheral neuropathy, CNS effects. Warnings: avoid in pregnancy and growing children, use with caution in elderly, limit sun exposure, avoid with antacids. Interactions: antacids, NSAIDs, theophylline, warfarin, tizanidine. Pregnancy Category C."
+  },
+  {
+    "id": 16,
+    "title": "Amlodipine (Norvasc, Amlopress, Amlokind)",
+    "content": "Amlodipine is a calcium channel blocker used for hypertension and angina. Dosage: 2.5-10mg once daily. Side effects: ankle swelling (edema), dizziness, flushing, headache, fatigue, palpitations. Warnings: caution in severe aortic stenosis, liver disease; may cause gingival hyperplasia. Interactions: simvastatin (limit to 20mg), cyclosporine, CYP3A4 inhibitors. Alternatives: nifedipine, felodipine, diltiazem. Pregnancy Category C. Store at room temperature."
+  },
+  {
+    "id": 17,
+    "title": "Losartan (Cozaar, Losar)",
+    "content": "Losartan is an angiotensin II receptor blocker (ARB) for hypertension, diabetic nephropathy, and heart failure. Dosage: 25-100mg once or twice daily. Side effects: dizziness, hyperkalemia, fatigue, upper respiratory infections, back pain. Warnings: avoid in pregnancy, monitor potassium and renal function. Interactions: potassium supplements, NSAIDs, lithium, ACE inhibitors. Alternatives: valsartan, telmisartan, irbesartan, lisinopril. Pregnancy Category D. Store at room temperature."
+  },
+  {
+    "id": 18,
+    "title": "Levothyroxine (Synthroid, Thyronorm, Eltroxin)",
+    "content": "Levothyroxine is a synthetic thyroid hormone for hypothyroidism and thyroid cancer. Dosage: 25-200mcg once daily on empty stomach, 30-60 min before breakfast. Side effects: palpitations, weight loss, tremor, insomnia, heat intolerance (signs of overtreatment). Warnings: start low in elderly and cardiac patients, regular TSH monitoring needed. Interactions: calcium, iron supplements, antacids, cholestyramine (take 4 hours apart). Pregnancy Category A (safe in pregnancy). Store away from heat and moisture."
+  },
+  {
+    "id": 19,
+    "title": "Montelukast (Singulair, Montair)",
+    "content": "Montelukast is a leukotriene receptor antagonist for asthma prevention and allergic rhinitis. Dosage: 10mg once daily (evening) for adults, 4-5mg for children. Side effects: headache, abdominal pain, upper respiratory infection; rare: neuropsychiatric events (agitation, depression, suicidal thinking). Warnings: FDA boxed warning for neuropsychiatric events, not for acute asthma attacks. Interactions: phenobarbital, rifampin, CYP inducers. Alternatives: inhaled corticosteroids, cetirizine. Pregnancy Category B."
+  },
+  {
+    "id": 20,
+    "title": "Diclofenac (Voltaren, Voveran)",
+    "content": "Diclofenac is an NSAID for pain, inflammation, arthritis, and gout. Available as tablets (50-100mg), gel, and injection. Dosage: 50mg 2-3 times daily or 75mg twice daily, max 150mg/day. Side effects: stomach pain, nausea, diarrhea, headache, elevated liver enzymes, increased cardiovascular risk. Warnings: take with food, avoid in active GI bleeding, use lowest effective dose. Interactions: warfarin, methotrexate, lithium, ACE inhibitors, other NSAIDs. Pregnancy Category C (D in third trimester). Store below 30°C."
+  },
+  {
+    "id": 21,
+    "title": "Clopidogrel (Plavix, Clopitab)",
+    "content": "Clopidogrel is an antiplatelet agent used to prevent blood clots after heart attacks, strokes, and stent placement. Dosage: 75mg once daily (300-600mg loading dose). Side effects: bleeding, bruising, stomach pain, diarrhea, rash. Warnings: do not stop without consulting doctor, increased bleeding risk during surgery. Interactions: omeprazole/esomeprazole (avoid), aspirin, NSAIDs, warfarin, SSRIs. Alternatives: prasugrel, ticagrelor. Pregnancy Category B. Store at room temperature."
+  },
+  {
+    "id": 22,
+    "title": "Metoprolol (Lopressor, Betaloc)",
+    "content": "Metoprolol is a beta-blocker for hypertension, angina, heart failure, and post-heart attack treatment. Dosage: 25-200mg daily (tartrate: twice daily; succinate: once daily). Side effects: fatigue, dizziness, bradycardia, cold extremities, weight gain, depression. Warnings: do not stop abruptly (risk of rebound hypertension), caution in asthma/COPD, diabetes (may mask hypoglycemia symptoms). Interactions: calcium channel blockers, digoxin, MAOIs, CYP2D6 inhibitors. Pregnancy Category C."
+  },
+  {
+    "id": 23,
+    "title": "Gabapentin (Neurontin, Gabapin)",
+    "content": "Gabapentin is an anticonvulsant used for neuropathic pain, epilepsy (adjunct), postherpetic neuralgia, and restless leg syndrome. Dosage: 300-3600mg daily in divided doses. Side effects: drowsiness, dizziness, fatigue, ataxia, peripheral edema, weight gain, blurred vision. Warnings: dose adjustment in renal impairment, may cause suicidal thoughts, taper gradually. Interactions: antacids (take 2 hours apart), opioids (increased CNS depression), alcohol. Alternatives: pregabalin, duloxetine. Pregnancy Category C."
+  },
+  {
+    "id": 24,
+    "title": "Ranitidine / Famotidine (Zantac, Pepcid)",
+    "content": "Famotidine is an H2 blocker that reduces stomach acid. Used for heartburn, peptic ulcers, GERD, and Zollinger-Ellison syndrome. Dosage: 20-40mg once or twice daily. Side effects: headache, dizziness, constipation, diarrhea. Note: Ranitidine (Zantac) was withdrawn from market due to NDMA contamination — Famotidine is the preferred alternative. Interactions: limited drug interactions, may affect ketoconazole absorption. Pregnancy Category B. Store at room temperature."
+  },
+  {
+    "id": 25,
+    "title": "Prednisone / Prednisolone (Deltasone, Wysolone)",
+    "content": "Prednisone is a corticosteroid for inflammation, autoimmune conditions, allergies, asthma exacerbations, and organ transplant rejection. Dosage: 5-60mg daily depending on condition. Side effects: weight gain, mood changes, insomnia, increased appetite, elevated blood sugar, osteoporosis, cataracts, immunosuppression (long-term). Warnings: taper gradually, do not stop abruptly, increased infection risk, avoid live vaccines. Interactions: NSAIDs, warfarin, diabetic medications, CYP3A4 inducers. Pregnancy Category C."
+  },
+  {
+    "id": 26,
+    "title": "Tramadol (Ultram, Contramal)",
+    "content": "Tramadol is a centrally acting opioid analgesic for moderate to moderately severe pain. Dosage: 50-100mg every 4-6 hours, max 400mg/day (300mg for elderly). Side effects: nausea, dizziness, constipation, headache, drowsiness, seizures (especially at high doses). Warnings: risk of addiction, do not combine with other CNS depressants, lower seizure threshold. Interactions: SSRIs/SNRIs (serotonin syndrome), MAOIs, alcohol, benzodiazepines, CYP3A4/2D6 inhibitors. Pregnancy Category C. Schedule IV controlled substance."
+  },
+  {
+    "id": 27,
+    "title": "Fluoxetine (Prozac, Fludac)",
+    "content": "Fluoxetine is an SSRI antidepressant for major depression, OCD, bulimia nervosa, panic disorder, and PMDD. Dosage: 20-80mg once daily (usually morning). Side effects: nausea, insomnia, headache, anxiety, sexual dysfunction, weight changes. Warnings: FDA black box warning for suicidality in young adults, do not stop abruptly, long half-life (1-3 days). Interactions: MAOIs (wait 5 weeks), thioridazine, pimozide, CYP2D6 substrates. Alternatives: sertraline, escitalopram, venlafaxine. Pregnancy Category C."
+  },
+  {
+    "id": 28,
+    "title": "Warfarin (Coumadin, Warf)",
+    "content": "Warfarin is an anticoagulant (blood thinner) for preventing blood clots in atrial fibrillation, DVT, PE, and after heart valve replacement. Dosage: individualized based on INR (typically 2-10mg daily). Side effects: bleeding (major risk), bruising, skin necrosis (rare), purple toe syndrome. Warnings: requires regular INR monitoring, many food and drug interactions, avoid during pregnancy. Interactions: vitamin K-rich foods, aspirin, NSAIDs, antibiotics, amiodarone, statins. Pregnancy Category X. Store at room temperature."
+  },
+  {
+    "id": 29,
+    "title": "Cefixime (Suprax, Taxim-O)",
+    "content": "Cefixime is a third-generation cephalosporin antibiotic for UTIs, otitis media, pharyngitis, bronchitis, and gonorrhea. Dosage: 400mg once daily or 200mg twice daily. Side effects: diarrhea, nausea, abdominal pain, headache, rash. Warnings: caution with penicillin allergy (cross-reactivity), complete full course. Interactions: warfarin (increased effect), carbamazepine. Alternatives: ceftriaxone, amoxicillin-clavulanate. Pregnancy Category B. Store at room temperature."
+  },
+  {
+    "id": 30,
+    "title": "Doxycycline (Vibramycin, Doxylab)",
+    "content": "Doxycycline is a tetracycline antibiotic for acne, respiratory infections, Lyme disease, malaria prophylaxis, STIs, and rickettsial infections. Dosage: 100mg once or twice daily. Side effects: nausea, photosensitivity, esophageal ulceration, vaginal yeast infection, tooth discoloration in children. Warnings: take with plenty of water, remain upright 30 min after dose, avoid sun exposure, not for children under 8. Interactions: antacids, iron, calcium, warfarin, oral contraceptives. Pregnancy Category D."
+  },
+  {
+    "id": 31,
+    "title": "Rosuvastatin (Crestor, Rosuvas)",
+    "content": "Rosuvastatin is a potent statin for high cholesterol, hyperlipidemia, and cardiovascular risk reduction. Dosage: 5-40mg once daily. Side effects: muscle pain, headache, nausea, abdominal pain, liver enzyme elevation; rare: rhabdomyolysis. Warnings: monitor liver function, report muscle pain/weakness, avoid in pregnancy. Interactions: cyclosporine, gemfibrozil, anticoagulants, protease inhibitors. Alternatives: atorvastatin, simvastatin, pravastatin. Pregnancy Category X. Store at room temperature."
+  },
+  {
+    "id": 32,
+    "title": "Esomeprazole (Nexium, Neksium)",
+    "content": "Esomeprazole is a proton pump inhibitor (PPI) for GERD, erosive esophagitis, peptic ulcers, and H. pylori eradication. Dosage: 20-40mg once daily, 30 minutes before a meal. Side effects: headache, nausea, diarrhea, flatulence, abdominal pain; long-term: magnesium deficiency, B12 deficiency, fracture risk. Warnings: similar to omeprazole, may interact with clopidogrel. Interactions: clopidogrel, methotrexate, warfarin, digoxin. Alternatives: omeprazole, pantoprazole, rabeprazole. Pregnancy Category B."
+  },
+  {
+    "id": 33,
+    "title": "Levofloxacin (Levaquin, Levoflox)",
+    "content": "Levofloxacin is a fluoroquinolone antibiotic for pneumonia, sinusitis, UTIs, skin infections, and anthrax. Dosage: 250-750mg once daily. Side effects: nausea, diarrhea, headache, insomnia, dizziness; serious: tendon rupture, peripheral neuropathy, QT prolongation, C. difficile colitis. Warnings: FDA black box warning for tendinitis, avoid in myasthenia gravis, use only when no alternative. Interactions: antacids, iron, NSAIDs, warfarin, theophylline. Pregnancy Category C."
+  },
+  {
+    "id": 34,
+    "title": "Clonazepam (Klonopin, Rivotril)",
+    "content": "Clonazepam is a benzodiazepine for epilepsy (seizure disorders), panic disorder, and anxiety. Dosage: 0.5-4mg daily in divided doses. Side effects: drowsiness, dizziness, cognitive impairment, depression, dependence. Warnings: risk of dependence and withdrawal, do not stop abruptly, avoid alcohol, FDA black box warning with opioids. Interactions: opioids, alcohol, other CNS depressants, CYP3A4 inhibitors. Alternatives: lorazepam, diazepam, levetiracetam. Pregnancy Category D. Schedule IV controlled substance."
+  },
+  {
+    "id": 35,
+    "title": "Insulin Glargine (Lantus, Basaglar)",
+    "content": "Insulin glargine is a long-acting basal insulin analog for Type 1 and Type 2 diabetes. Dosage: individualized, typically 10-80 units subcutaneously once daily at same time. Side effects: hypoglycemia (main risk), injection site reactions, weight gain, lipodystrophy. Warnings: never share insulin pens, rotate injection sites, monitor blood glucose regularly, dose adjustment needed with renal/hepatic impairment. Interactions: beta-blockers (may mask hypoglycemia), corticosteroids, thiazides. Pregnancy Category C. Refrigerate unopened; room temperature for 28 days once opened."
+  },
+  {
+    "id": 36,
+    "title": "Salbutamol / Albuterol (Ventolin, Asthalin)",
+    "content": "Salbutamol is a short-acting beta-2 agonist bronchodilator for asthma, COPD, and exercise-induced bronchospasm. Dosage: inhaler: 1-2 puffs every 4-6 hours as needed; nebulizer: 2.5-5mg. Side effects: tremor, palpitations, tachycardia, headache, muscle cramps, nervousness. Warnings: not for regular scheduled use, seek emergency if not improving, may cause paradoxical bronchospasm. Interactions: beta-blockers (antagonize effect), MAOIs, tricyclic antidepressants. Alternatives: levalbuterol, ipratropium. Pregnancy Category C. Store at room temperature."
+  },
+  {
+    "id": 37,
+    "title": "Hydrochlorothiazide (HCTZ, Aquazide)",
+    "content": "Hydrochlorothiazide is a thiazide diuretic for hypertension and edema. Dosage: 12.5-50mg once daily. Side effects: hypokalemia, hyponatremia, hyperuricemia, photosensitivity, dizziness, increased blood sugar, increased cholesterol. Warnings: monitor electrolytes, may precipitate gout, caution in diabetes, avoid in severe renal impairment. Interactions: lithium, digoxin, NSAIDs, ACE inhibitors, corticosteroids. Alternatives: chlorthalidone, indapamide. Pregnancy Category B. Take in the morning."
+  },
+  {
+    "id": 38,
+    "title": "Duloxetine (Cymbalta, Duzela)",
+    "content": "Duloxetine is an SNRI antidepressant for major depression, generalized anxiety, diabetic neuropathic pain, fibromyalgia, and chronic musculoskeletal pain. Dosage: 30-60mg once daily (max 120mg). Side effects: nausea, dry mouth, drowsiness, constipation, fatigue, decreased appetite, sweating. Warnings: do not stop abruptly, hepatotoxicity risk, suicidality in young adults. Interactions: MAOIs, thioridazine, CYP1A2 inhibitors, alcohol, anticoagulants. Alternatives: venlafaxine, sertraline, pregabalin. Pregnancy Category C."
+  },
+  {
+    "id": 39,
+    "title": "Domperidone (Motilium, Domstal)",
+    "content": "Domperidone is a dopamine antagonist antiemetic used for nausea, vomiting, gastroparesis, and dyspepsia. Dosage: 10mg 3 times daily before meals, max 30mg/day. Side effects: dry mouth, headache, diarrhea, breast tenderness, galactorrhea; serious: QT prolongation, cardiac arrhythmias. Warnings: not FDA-approved in US, cardiac risk in elderly, avoid in prolactinoma. Interactions: CYP3A4 inhibitors (ketoconazole, erythromycin), QT-prolonging drugs. Alternatives: metoclopramide, ondansetron. Pregnancy Category C. Store below 25°C."
+  },
+  {
+    "id": 40,
+    "title": "Telmisartan (Micardis, Telma)",
+    "content": "Telmisartan is an ARB (angiotensin II receptor blocker) for hypertension and cardiovascular risk reduction in patients unable to take ACE inhibitors. Dosage: 20-80mg once daily. Side effects: dizziness, back pain, sinusitis, diarrhea, hyperkalemia. Warnings: avoid in pregnancy, monitor potassium and renal function, dual RAAS blockade not recommended. Interactions: lithium, NSAIDs, potassium-sparing diuretics, digoxin. Alternatives: losartan, valsartan, irbesartan, olmesartan. Pregnancy Category D. Store at room temperature."
+  },
+  {
+    "id": 41,
+    "title": "Ondansetron (Zofran, Emeset)",
+    "content": "Ondansetron is a serotonin 5-HT3 receptor antagonist antiemetic for nausea and vomiting due to chemotherapy, radiation, surgery, and pregnancy (off-label). Dosage: 4-8mg every 8 hours (oral/IV). Side effects: headache, constipation, dizziness, fatigue; rare: QT prolongation, serotonin syndrome. Warnings: dose adjust in hepatic impairment, ECG monitoring with IV use. Interactions: apomorphine (contraindicated), serotonergic drugs, QT-prolonging drugs. Alternatives: granisetron, domperidone, metoclopramide. Pregnancy Category B."
+  },
+  {
+    "id": 42,
+    "title": "Rabeprazole (Aciphex, Razo)",
+    "content": "Rabeprazole is a proton pump inhibitor (PPI) for GERD, duodenal ulcers, H. pylori, and hypersecretory conditions. Dosage: 20mg once daily. Side effects: headache, diarrhea, nausea, pharyngitis, flatulence; long-term: bone fractures, C. difficile, hypomagnesemia. Warnings: shortest duration possible, may mask gastric malignancy. Interactions: methotrexate, warfarin, cyclosporine. Alternatives: omeprazole, pantoprazole, esomeprazole, lansoprazole. Pregnancy Category B. Store at room temperature protected from moisture."
+  },
+  {
+    "id": 43,
+    "title": "Spironolactone (Aldactone)",
+    "content": "Spironolactone is a potassium-sparing diuretic and aldosterone antagonist for heart failure, hypertension, ascites, and hormonal acne/hirsutism. Dosage: 25-200mg daily. Side effects: hyperkalemia, gynecomastia, menstrual irregularities, dizziness, GI upset. Warnings: monitor potassium closely, avoid potassium supplements, caution with ACE inhibitors/ARBs. Interactions: ACE inhibitors, ARBs, potassium supplements, NSAIDs, lithium, digoxin. Alternatives: eplerenone, amiloride. Pregnancy Category C."
+  },
+  {
+    "id": 44,
+    "title": "Loperamide (Imodium)",
+    "content": "Loperamide is an antidiarrheal opioid receptor agonist that slows gut motility. Dosage: 4mg initially, then 2mg after each loose stool, max 16mg/day. Side effects: constipation, abdominal cramps, dizziness, nausea, dry mouth. Warnings: do not use for bloody diarrhea or C. difficile, cardiac toxicity at high doses (QT prolongation), not for children under 2. Interactions: P-glycoprotein inhibitors, ritonavir, ketoconazole. Alternatives: bismuth subsalicylate, probiotics. Pregnancy Category B. Available over the counter."
+  },
+  {
+    "id": 45,
+    "title": "Cephalexin (Keflex, Sporidex)",
+    "content": "Cephalexin is a first-generation cephalosporin antibiotic for skin infections (cellulitis), UTIs, pharyngitis, otitis media, and bone infections. Dosage: 250-500mg every 6 hours or 500mg every 12 hours. Side effects: diarrhea, nausea, stomach pain, rash, vaginal yeast infection. Warnings: caution with penicillin allergy, complete full course, dose adjustment in renal impairment. Interactions: metformin, warfarin, probenecid. Alternatives: amoxicillin, dicloxacillin, clindamycin. Pregnancy Category B."
+  },
+  {
+    "id": 46,
+    "title": "Escitalopram (Lexapro, Cipralex)",
+    "content": "Escitalopram is an SSRI antidepressant for major depressive disorder and generalized anxiety disorder. Dosage: 10-20mg once daily. Side effects: nausea, insomnia, ejaculation disorder, fatigue, sweating, somnolence. Warnings: suicidality risk in young adults, QT prolongation at high doses, serotonin syndrome risk, taper on discontinuation. Interactions: MAOIs, pimozide, CYP2C19 inhibitors, serotonergic drugs, NSAIDs/warfarin (bleeding risk). Alternatives: sertraline, fluoxetine, paroxetine, venlafaxine. Pregnancy Category C."
+  },
+  {
+    "id": 47,
+    "title": "Vitamin D3 / Cholecalciferol (D-Rise, Calcirol)",
+    "content": "Vitamin D3 is a fat-soluble vitamin/supplement for vitamin D deficiency, osteoporosis prevention, rickets, and calcium metabolism. Dosage: 600-2000 IU daily maintenance; 60,000 IU weekly for deficiency (as directed). Side effects: hypercalcemia at high doses (nausea, constipation, weakness, kidney stones). Warnings: regular monitoring of calcium and vitamin D levels, avoid megadoses without medical supervision. Interactions: thiazide diuretics, corticosteroids, cholestyramine, orlistat. Store in a cool dry place protected from light."
+  },
+  {
+    "id": 48,
+    "title": "Folic Acid (Folart)",
+    "content": "Folic acid is a B-vitamin (B9) supplement for folate deficiency, megaloblastic anemia, pregnancy (neural tube defect prevention), and methotrexate therapy. Dosage: 400mcg-1mg daily (up to 5mg for deficiency). Side effects: generally well-tolerated; high doses may mask B12 deficiency. Warnings: rule out B12 deficiency before treating, use preconceptionally for NTD prevention. Interactions: methotrexate, phenytoin, sulfasalazine, metformin. Pregnancy: essential during pregnancy. Store at room temperature."
+  },
+  {
+    "id": 49,
+    "title": "Clindamycin (Cleocin, Dalacin)",
+    "content": "Clindamycin is a lincosamide antibiotic for skin/soft tissue infections, bone/joint infections, pelvic infections, and acne (topical). Dosage: 150-450mg every 6-8 hours (oral); topical 1% gel/lotion. Side effects: diarrhea, nausea, rash, C. difficile colitis (serious — can be fatal). Warnings: discontinue if severe diarrhea occurs, C. difficile risk, not effective against most gram-negative bacteria. Interactions: erythromycin (antagonistic), neuromuscular blocking agents, warfarin. Alternatives: azithromycin, trimethoprim-sulfamethoxazole. Pregnancy Category B."
+  },
+  {
+    "id": 50,
+    "title": "Ofloxacin (Floxin, Oflox)",
+    "content": "Ofloxacin is a fluoroquinolone antibiotic for UTIs, respiratory infections, skin infections, and eye/ear infections (drops). Dosage: 200-400mg twice daily (oral); drops as directed. Side effects: nausea, diarrhea, headache, insomnia, dizziness; serious: tendon rupture, peripheral neuropathy, QT prolongation. Warnings: similar to ciprofloxacin/levofloxacin class warnings, avoid in children and pregnancy. Interactions: antacids, iron, zinc, NSAIDs, warfarin, theophylline. Alternatives: levofloxacin, ciprofloxacin, moxifloxacin. Pregnancy Category C."
   }
 ]

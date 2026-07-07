@@ -1,431 +1,845 @@
 /**
- * DrugFX Frontend — app.js v2.0
- * Handles UI state, form submissions, loading steps, and result rendering.
+ * DrugFX Frontend Controller — app.js v3.0
+ * Fully rewritten single-page application orchestrating views, theme management,
+ * debounced search suggestions, drag-drop uploads, OCR review, loading milestones,
+ * results dashboard, and multiple formats export.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ── DOM refs ───────────────────────────────────────────────
-  const btnText  = document.getElementById('btn-text');
-  const btnImage = document.getElementById('btn-image');
-  const formText  = document.getElementById('form-text');
-  const formImage = document.getElementById('form-image');
+  // ─── STATE MANAGEMENT ───────────────────────────────────────
+  const state = {
+    theme: localStorage.getItem('drugfx-theme') || 'dark',
+    view: 'landing', // landing | ocr-review | loading | dashboard | error
+    activeFile: null,
+    ocrText: '',
+    ocrConfidence: 0,
+    ocrProvider: '',
+    lastResult: null,
+    debounceTimer: null,
+    searchFocusedIndex: -1,
+    suggestions: []
+  };
 
-  const uploadZone    = document.getElementById('upload-zone');
-  const imageInput    = document.getElementById('image-input');
-  const uploadContent = document.getElementById('upload-content');
-  const uploadPreview = document.getElementById('upload-preview');
-  const previewImg    = document.getElementById('preview-img');
-  const previewName   = document.getElementById('preview-name');
-  const previewClear  = document.getElementById('preview-clear');
+  // ─── DOM SELECTORS ──────────────────────────────────────────
+  // Layout views
+  const viewLanding = document.getElementById('view-landing');
+  const viewOcrReview = document.getElementById('view-ocr-review');
+  const viewLoading = document.getElementById('view-loading');
+  const viewDashboard = document.getElementById('view-dashboard');
+  const viewError = document.getElementById('view-error');
 
-  const btnAnalyzeText  = document.getElementById('btn-analyze-text');
-  const btnAnalyzeImage = document.getElementById('btn-analyze-image');
+  // Navigation & Theme
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  const logoHomeLink = document.getElementById('logo-home-link');
+  const navHome = document.getElementById('nav-home');
+  const navHow = document.getElementById('nav-how');
+  const navFeatures = document.getElementById('nav-features');
+  const navFaq = document.getElementById('nav-faq');
+  const footerHomeTriggers = document.querySelectorAll('.footer-nav-home-trigger');
+  const btnHeaderAnalyze = document.getElementById('btn-header-analyze');
 
-  // Result panels
-  const emptyState   = document.getElementById('empty-state');
-  const loadingState = document.getElementById('loading-state');
-  const resultsWrap  = document.getElementById('results-wrap');
-  const errorState   = document.getElementById('error-state');
-  const errorMsg     = document.getElementById('error-msg');
-  const btnRetry     = document.getElementById('btn-retry');
+  // Search UI
+  const searchInputField = document.getElementById('search-input-field');
+  const suggestionsBox = document.getElementById('suggestions-box');
+  const btnSearchSearch = document.getElementById('btn-search-search');
+  const chipButtons = document.querySelectorAll('.example-searches .chip');
 
-  // Result sections
-  const drugName           = document.getElementById('drug-name');
-  const statusBadge        = document.getElementById('status-badge');
-  const resultBadges       = document.getElementById('result-badges');
-  const btnCopy            = document.getElementById('btn-copy');
-  const sectionOcr         = document.getElementById('section-ocr');
-  const ocrText            = document.getElementById('ocr-text');
-  const sectionMeta        = document.getElementById('section-meta');
-  const metaGrid           = document.getElementById('meta-grid');
-  const synopsisText       = document.getElementById('synopsis-text');
-  const keySeGrid          = document.getElementById('key-se-grid');
-  const seList             = document.getElementById('se-list');
-  const usesList           = document.getElementById('uses-list');
-  const dosageText         = document.getElementById('dosage-text');
-  const warnList           = document.getElementById('warn-list');
-  const interactionsTags   = document.getElementById('interactions-tags');
-  const alternativesTags   = document.getElementById('alternatives-tags');
+  // Upload UI
+  const fileUploaderInput = document.getElementById('file-uploader-input');
+  const dragDropZone = document.getElementById('drag-drop-zone');
+  const btnUploadTriggerShortcut = document.getElementById('btn-upload-trigger-shortcut');
+  const dragzoneIdleState = document.getElementById('dragzone-idle-state');
+  const dragzoneSelectedState = document.getElementById('dragzone-selected-state');
+  const previewThumbnailImg = document.getElementById('preview-thumbnail-img');
+  const previewFilenameText = document.getElementById('preview-filename-text');
+  const btnClearFile = document.getElementById('btn-clear-file');
 
-  // Loading steps
-  const ls1 = document.getElementById('ls-1');
-  const ls2 = document.getElementById('ls-2');
-  const ls3 = document.getElementById('ls-3');
+  // OCR Review UI
+  const reviewOriginalImg = document.getElementById('review-original-img');
+  const reviewTextEditor = document.getElementById('review-text-editor');
+  const ocrConfidenceText = document.getElementById('ocr-confidence-text');
+  const ocrProviderText = document.getElementById('ocr-provider-text');
+  const btnOcrCancel = document.getElementById('btn-ocr-cancel');
+  const btnOcrProceed = document.getElementById('btn-ocr-proceed');
 
-  let lastResultData = null;
-  let loadingTimer = null;
+  // Loading Steps UI
+  const stepOcr = document.getElementById('step-ocr');
+  const stepRag = document.getElementById('step-rag');
+  const stepLlm = document.getElementById('step-llm');
 
-  // ── Mode Switcher ──────────────────────────────────────────
-  btnText.addEventListener('click', () => switchMode('text'));
-  btnImage.addEventListener('click', () => switchMode('image'));
+  // Dashboard UI
+  const dashDrugName = document.getElementById('dash-drug-name');
+  const dashGenericName = document.getElementById('dash-generic-name');
+  const dashDrugClass = document.getElementById('dash-drug-class');
+  const dashConfidenceBadge = document.getElementById('dash-confidence-badge');
+  const dashSynopsis = document.getElementById('dash-synopsis');
+  
+  // Dashboard details elements
+  const dashMetaMfg = document.getElementById('dash-meta-mfg');
+  const dashMetaExp = document.getElementById('dash-meta-exp');
+  const dashMetaBatch = document.getElementById('dash-meta-batch');
+  const dashUsesList = document.getElementById('dash-uses-list');
+  const dashDosageAdult = document.getElementById('dash-dosage-adult');
+  const dashDosageMax = document.getElementById('dash-dosage-max');
+  const dashDosageFood = document.getElementById('dash-dosage-food');
+  const dashDosageDesc = document.getElementById('dash-dosage-desc');
+  const dashCommonSeList = document.getElementById('dash-common-se-list');
+  const dashSeriousSeList = document.getElementById('dash-serious-se-list');
+  const dashWarningsList = document.getElementById('dash-warnings-list');
+  const dashInteractionsTags = document.getElementById('dash-interactions-tags');
+  const dashAlternativesTags = document.getElementById('dash-alternatives-tags');
+  
+  // Safety advisories elements
+  const dashSafetyPregnancy = document.getElementById('dash-safety-pregnancy');
+  const dashSafetyBreastfeeding = document.getElementById('dash-safety-breastfeeding');
+  const dashSafetyAlcohol = document.getElementById('dash-safety-alcohol');
+  const dashSafetyDriving = document.getElementById('dash-safety-driving');
+  
+  // Storage & Overdose
+  const dashStorageVal = document.getElementById('dash-storage-val');
+  const dashOverdoseVal = document.getElementById('dash-overdose-val');
+  const dashMissedDoseVal = document.getElementById('dash-missed-dose-val');
+  
+  // FAQ Dashboard List
+  const dashFaqList = document.getElementById('dash-faq-list');
 
-  function switchMode(mode) {
-    if (mode === 'text') {
-      btnText.classList.add('active');
-      btnText.setAttribute('aria-selected', 'true');
-      btnImage.classList.remove('active');
-      btnImage.setAttribute('aria-selected', 'false');
-      formText.classList.remove('hidden');
-      formText.classList.add('visible');
-      formImage.classList.add('hidden');
-      formImage.classList.remove('visible');
-    } else {
-      btnImage.classList.add('active');
-      btnImage.setAttribute('aria-selected', 'true');
-      btnText.classList.remove('active');
-      btnText.setAttribute('aria-selected', 'false');
-      formImage.classList.remove('hidden');
-      formImage.classList.add('visible');
-      formText.classList.add('hidden');
-      formText.classList.remove('visible');
-    }
+  // Export buttons
+  const btnExportCopy = document.getElementById('btn-export-copy');
+  const btnExportPdf = document.getElementById('btn-export-pdf');
+  const btnExportJson = document.getElementById('btn-export-json');
+  const btnActionNewSearch = document.getElementById('btn-action-new-search');
+
+  // Sidebar target buttons
+  const sidebarMenuBtns = document.querySelectorAll('.sidebar-menu-btn');
+
+  // Error Recovery UI
+  const errorMessageText = document.getElementById('error-message-text');
+  const btnErrorHome = document.getElementById('btn-error-home');
+  const btnErrorRetry = document.getElementById('btn-error-retry');
+
+  // ─── THEME CONFIGURATION ────────────────────────────────────
+  function applyTheme() {
+    document.documentElement.setAttribute('data-theme', state.theme);
+    localStorage.setItem('drugfx-theme', state.theme);
   }
 
-  // ── Image Upload ───────────────────────────────────────────
-  imageInput.addEventListener('change', handleFileSelect);
-  previewClear.addEventListener('click', clearFileSelect);
-
-  ['dragover', 'dragleave', 'drop'].forEach(ev => {
-    uploadZone.addEventListener(ev, e => e.preventDefault());
+  themeToggleBtn.addEventListener('click', () => {
+    state.theme = state.theme === 'dark' ? 'light' : 'dark';
+    applyTheme();
   });
 
-  uploadZone.addEventListener('dragover', () => uploadZone.classList.add('dragover'));
-  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-  uploadZone.addEventListener('drop', (e) => {
-    uploadZone.classList.remove('dragover');
-    if (e.dataTransfer.files.length) {
-      imageInput.files = e.dataTransfer.files;
-      handleFileSelect();
+  // Apply default configured theme
+  applyTheme();
+
+  // ─── VIEW ROUTER ────────────────────────────────────────────
+  function showView(targetView) {
+    state.view = targetView;
+    
+    // Hide all views
+    [viewLanding, viewOcrReview, viewLoading, viewDashboard, viewError].forEach(v => {
+      v.classList.add('hidden');
+    });
+
+    // Show active view
+    if (targetView === 'landing') {
+      viewLanding.classList.remove('hidden');
+      resetNavActive(navHome);
+    } else if (targetView === 'ocr-review') {
+      viewOcrReview.classList.remove('hidden');
+    } else if (targetView === 'loading') {
+      viewLoading.classList.remove('hidden');
+    } else if (targetView === 'dashboard') {
+      viewDashboard.classList.remove('hidden');
+    } else if (targetView === 'error') {
+      viewError.classList.remove('hidden');
     }
+
+    // Scroll to top on view changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetNavActive(activeEl) {
+    [navHome, navHow, navFeatures, navFaq].forEach(l => l.classList.remove('active'));
+    if (activeEl) activeEl.classList.add('active');
+  }
+
+  // Bind Navbar Home link
+  logoHomeLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    showView('landing');
+  });
+  navHome.addEventListener('click', (e) => {
+    e.preventDefault();
+    showView('landing');
+  });
+  btnHeaderAnalyze.addEventListener('click', () => {
+    showView('landing');
+    window.scrollTo({ top: dragDropZone.offsetTop - 120, behavior: 'smooth' });
   });
 
-  function handleFileSelect() {
-    const file = imageInput.files[0];
-    if (!file) return;
+  // Smooth scroll links for standard navbar anchors
+  navHow.addEventListener('click', (e) => {
+    e.preventDefault();
+    showView('landing');
+    resetNavActive(navHow);
+    document.getElementById('how-it-works-section').scrollIntoView({ behavior: 'smooth' });
+  });
+  navFeatures.addEventListener('click', (e) => {
+    e.preventDefault();
+    showView('landing');
+    resetNavActive(navFeatures);
+    document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' });
+  });
+  navFaq.addEventListener('click', (e) => {
+    e.preventDefault();
+    showView('landing');
+    resetNavActive(navFaq);
+    document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' });
+  });
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      previewImg.src = e.target.result;
-      previewName.textContent = file.name;
-      uploadContent.classList.add('hidden');
-      uploadPreview.classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
-  }
+  footerHomeTriggers.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      showView('landing');
+    });
+  });
 
-  function clearFileSelect() {
-    imageInput.value = '';
-    previewImg.src = '#';
-    uploadContent.classList.remove('hidden');
-    uploadPreview.classList.add('hidden');
-  }
+  // Bind Sidebar Navigation inside Dashboard
+  sidebarMenuBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      sidebarMenuBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const targetId = btn.getAttribute('data-target');
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
 
-  // ── UI State Management ────────────────────────────────────
-  function showEmpty() {
-    emptyState.classList.remove('hidden');
-    loadingState.classList.add('hidden');
-    resultsWrap.classList.add('hidden');
-    errorState.classList.add('hidden');
-  }
+  // Accordion toggle on FAQ page
+  const faqItems = document.querySelectorAll('.faq-item');
+  faqItems.forEach(item => {
+    const questionBtn = item.querySelector('.faq-question');
+    questionBtn.addEventListener('click', () => {
+      const isActive = item.classList.contains('active');
+      faqItems.forEach(i => i.classList.remove('active'));
+      if (!isActive) {
+        item.classList.add('active');
+      }
+    });
+  });
 
-  function showLoading() {
-    emptyState.classList.add('hidden');
-    loadingState.classList.remove('hidden');
-    resultsWrap.classList.add('hidden');
-    errorState.classList.add('hidden');
-    animateLoadingSteps();
-  }
+  // ─── DEBOUNCED SEARCH & AUTOCOMPLETE ─────────────────────────
+  searchInputField.addEventListener('input', () => {
+    clearTimeout(state.debounceTimer);
+    state.debounceTimer = setTimeout(() => {
+      fetchSuggestions(searchInputField.value);
+    }, 300);
+  });
 
-  function showResults() {
-    emptyState.classList.add('hidden');
-    loadingState.classList.add('hidden');
-    resultsWrap.classList.remove('hidden');
-    errorState.classList.add('hidden');
-    clearTimeout(loadingTimer);
-  }
-
-  function showError(msg) {
-    emptyState.classList.add('hidden');
-    loadingState.classList.add('hidden');
-    resultsWrap.classList.add('hidden');
-    errorState.classList.remove('hidden');
-    errorMsg.textContent = msg || 'An unexpected error occurred. Please try again.';
-    clearTimeout(loadingTimer);
-  }
-
-  function animateLoadingSteps() {
-    [ls1, ls2, ls3].forEach(el => { el.classList.remove('active', 'done'); });
-    ls1.classList.add('active');
-    loadingTimer = setTimeout(() => {
-      ls1.classList.remove('active'); ls1.classList.add('done');
-      ls2.classList.add('active');
-      loadingTimer = setTimeout(() => {
-        ls2.classList.remove('active'); ls2.classList.add('done');
-        ls3.classList.add('active');
-      }, 1800);
-    }, 1000);
-  }
-
-  function setButtonLoading(btn, isLoading) {
-    if (isLoading) {
-      btn.classList.add('loading');
-      btn.disabled = true;
-    } else {
-      btn.classList.remove('loading');
-      btn.disabled = false;
-    }
-  }
-
-  // ── Render Results ─────────────────────────────────────────
-  function renderResults(response) {
-    const data = response.data;
-    if (!data) {
-      showError(response.error || 'No data returned from the server.');
+  async function fetchSuggestions(query) {
+    if (!query || query.trim().length < 1) {
+      hideSuggestions();
       return;
     }
 
-    lastResultData = response;
+    try {
+      const response = await fetch(`/api/search/suggest?q=${encodeURIComponent(query.trim())}`);
+      const data = await response.json();
+      state.suggestions = data.suggestions || [];
+      renderSuggestions();
+    } catch (err) {
+      console.error("Failed to fetch suggestions", err);
+    }
+  }
 
-    // Drug header
-    drugName.textContent = data.drug_name || 'Unknown Drug';
-
-    // Status badge
-    resultBadges.innerHTML = `<span class="rbadge rbadge--success">✓ Analysis Complete</span>`;
-    if (response.input_type === 'image') {
-      resultBadges.innerHTML += `<span class="rbadge rbadge--image">📷 Image Scan</span>`;
+  function renderSuggestions() {
+    if (state.suggestions.length === 0) {
+      hideSuggestions();
+      return;
     }
 
-    // OCR extracted text
-    if (response.input_type === 'image' && response.extracted_text) {
-      sectionOcr.classList.remove('hidden');
-      ocrText.textContent = response.extracted_text;
-    } else {
-      sectionOcr.classList.add('hidden');
-    }
-
-    // Label metadata (MFG / Expiry / Batch)
-    const hasMfg     = data.mfg_date;
-    const hasExp     = data.expiry_date;
-    const hasBatch   = data.batch_no;
-
-    if (response.input_type === 'image') {
-      sectionMeta.classList.remove('hidden');
-      metaGrid.innerHTML = buildMetaItem('Manufacturing Date', hasMfg)
-        + buildMetaItem('Expiry Date', hasExp)
-        + buildMetaItem('Batch / Lot No.', hasBatch);
-    } else {
-      sectionMeta.classList.add('hidden');
-    }
-
-    // Synopsis
-    synopsisText.textContent = data.synopsis || 'No synopsis available.';
-
-    // Critical Side Effects
-    keySeGrid.innerHTML = '';
-    const keyEffects = Array.isArray(data.key_side_effects) ? data.key_side_effects : [];
-    if (keyEffects.length > 0) {
-      keyEffects.forEach((eff, i) => {
-        const chip = document.createElement('div');
-        chip.className = 'kse-chip';
-        chip.style.animationDelay = `${i * 60}ms`;
-        chip.textContent = eff;
-        keySeGrid.appendChild(chip);
+    suggestionsBox.innerHTML = '';
+    state.suggestions.forEach((suggest, idx) => {
+      const div = document.createElement('div');
+      div.className = 'suggestion-item';
+      div.textContent = suggest;
+      div.setAttribute('role', 'option');
+      div.setAttribute('id', `suggestion-opt-${idx}`);
+      
+      div.addEventListener('click', () => {
+        searchInputField.value = suggest;
+        hideSuggestions();
+        triggerTextSearch(suggest);
       });
-      document.getElementById('section-key-se').classList.remove('hidden');
-    } else {
-      document.getElementById('section-key-se').classList.add('hidden');
-    }
+      suggestionsBox.appendChild(div);
+    });
 
-    // Full Side Effects
-    renderList(seList, data.side_effects, 'No side effects listed.');
-
-    // Uses
-    renderList(usesList, data.uses, 'No uses listed.');
-
-    // Dosage
-    dosageText.textContent = data.dosage || 'Consult your prescriber.';
-
-    // Warnings
-    renderWarnList(warnList, data.warnings);
-
-    // Interactions
-    renderTagCloud(interactionsTags, data.drug_interactions, 'tag--teal');
-
-    // Alternatives
-    renderTagCloud(alternativesTags, data.alternatives, 'tag--indigo');
-
-    showResults();
+    suggestionsBox.classList.add('active');
+    state.searchFocusedIndex = -1;
   }
 
-  function buildMetaItem(label, value) {
-    if (value) {
-      return `<div class="meta-item">
-        <span class="meta-label">${label}</span>
-        <span class="meta-value">${escHtml(value)}</span>
-      </div>`;
-    } else {
-      return `<div class="meta-item">
-        <span class="meta-label">${label}</span>
-        <span class="meta-value not-detected">Not detected on label</span>
-      </div>`;
-    }
+  function hideSuggestions() {
+    suggestionsBox.classList.remove('active');
+    state.searchFocusedIndex = -1;
   }
 
-  function renderList(ulEl, items, emptyMsg) {
-    ulEl.innerHTML = '';
-    const arr = Array.isArray(items) ? items : [];
-    if (arr.length === 0) {
-      const li = document.createElement('li');
-      li.textContent = emptyMsg;
-      li.style.color = 'var(--text-3)';
-      li.style.fontStyle = 'italic';
-      ulEl.appendChild(li);
-    } else {
-      arr.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = item;
-        ulEl.appendChild(li);
+  // Keyboard navigation for suggestions
+  searchInputField.addEventListener('keydown', (e) => {
+    const items = suggestionsBox.querySelectorAll('.suggestion-item');
+    if (!suggestionsBox.classList.contains('active') || items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      state.searchFocusedIndex = (state.searchFocusedIndex + 1) % items.length;
+      updateSuggestionFocus(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      state.searchFocusedIndex = (state.searchFocusedIndex - 1 + items.length) % items.length;
+      updateSuggestionFocus(items);
+    } else if (e.key === 'Enter') {
+      if (state.searchFocusedIndex > -1) {
+        e.preventDefault();
+        items[state.searchFocusedIndex].click();
+      }
+    } else if (e.key === 'Escape') {
+      hideSuggestions();
+    }
+  });
+
+  function updateSuggestionFocus(items) {
+    items.forEach((item, idx) => {
+      if (idx === state.searchFocusedIndex) {
+        item.classList.add('focused');
+        searchInputField.setAttribute('aria-activedescendant', item.id);
+      } else {
+        item.classList.remove('focused');
+      }
+    });
+  }
+
+  // Hide suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!searchInputField.contains(e.target) && !suggestionsBox.contains(e.target)) {
+      hideSuggestions();
+    }
+  });
+
+  // Bind Search Trigger Button
+  btnSearchSearch.addEventListener('click', () => {
+    const val = searchInputField.value.trim();
+    if (val) triggerTextSearch(val);
+  });
+
+  // Bind Chip example triggers
+  chipButtons.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const drug = chip.getAttribute('data-query');
+      searchInputField.value = drug;
+      triggerTextSearch(drug);
+    });
+  });
+
+  // ─── FILE UPLOAD PROCESSING ────────────────────────────────
+  // Direct file click triggers
+  btnUploadTriggerShortcut.addEventListener('click', () => {
+    fileUploaderInput.click();
+  });
+  dragDropZone.addEventListener('click', () => {
+    fileUploaderInput.click();
+  });
+  
+  // Support drag keyboard space/enter press trigger
+  dragDropZone.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      fileUploaderInput.click();
+    }
+  });
+
+  // Handle Drag Over events
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dragDropZone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dragDropZone.classList.add('dragover');
+    }, false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dragDropZone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dragDropZone.classList.remove('dragover');
+    }, false);
+  });
+
+  // Handle Drop file select
+  dragDropZone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length > 0) {
+      handleFileSelection(files[0]);
+    }
+  });
+
+  fileUploaderInput.addEventListener('change', () => {
+    if (fileUploaderInput.files.length > 0) {
+      handleFileSelection(fileUploaderInput.files[0]);
+    }
+  });
+
+  function handleFileSelection(file) {
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File size exceeds 10MB limit. Please select a smaller file.");
+      return;
+    }
+    state.activeFile = file;
+    
+    // Render Selected UI Preview
+    previewFilenameText.textContent = file.name;
+    
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewThumbnailImg.src = e.target.result;
+        reviewOriginalImg.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else if (file.type === 'application/pdf') {
+      previewThumbnailImg.src = 'https://img.icons8.com/color/96/pdf.png';
+      reviewOriginalImg.src = 'https://img.icons8.com/color/96/pdf.png';
+    }
+
+    dragzoneIdleState.style.display = 'none';
+    dragzoneSelectedState.style.display = 'flex';
+
+    // Auto-trigger analysis for premium speed
+    triggerImageOCRUpload(file);
+  }
+
+  btnClearFile.addEventListener('click', (e) => {
+    e.stopPropagation(); // Avoid triggering open browse dialog
+    clearUploadedFile();
+  });
+
+  function clearUploadedFile() {
+    state.activeFile = null;
+    fileUploaderInput.value = '';
+    previewThumbnailImg.src = '';
+    reviewOriginalImg.src = '';
+    dragzoneSelectedState.style.display = 'none';
+    dragzoneIdleState.style.display = 'flex';
+  }
+
+  // ─── PIPELINE TRIGGERS & ACTIONS ────────────────────────────
+  
+  // OCR Correction cancel
+  btnOcrCancel.addEventListener('click', () => {
+    clearUploadedFile();
+    showView('landing');
+  });
+
+  // Submit corrected text for RAG+LLM analysis
+  btnOcrProceed.addEventListener('click', () => {
+    const correctedText = reviewTextEditor.value.trim();
+    if (!correctedText) {
+      alert("Verification text cannot be empty.");
+      return;
+    }
+    triggerFinalAnalysis(correctedText);
+  });
+
+  // 1. Image Upload -> OCR Pipeline
+  async function triggerImageOCRUpload(file) {
+    showView('loading');
+    updateLoadingStep('ocr', 'active');
+    
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/analyze/image', {
+        method: 'POST',
+        body: formData
       });
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.detail || `Server status ${res.status}`);
+      }
+
+      if (data.success === false) {
+        // Fallback to error view
+        throw new Error(data.error?.message || data.error || 'Failed to parse image label.');
+      }
+
+      // Record OCR results in state
+      state.ocrText = data.extracted_text || '';
+      state.ocrConfidence = Math.round((data.ocr?.confidence || 0.85) * 100);
+      state.ocrProvider = data.ocr?.provider || 'Gemini Vision';
+
+      // Load OCR values into Review Text Area
+      reviewTextEditor.value = state.ocrText;
+      ocrConfidenceText.textContent = `${state.ocrConfidence}% Confidence`;
+      ocrProviderText.textContent = state.ocrProvider === 'tesseract' ? 'Tesseract OCR' : 'Gemini Vision';
+
+      // Switch to OCR Review view instead of direct dashboard rendering
+      updateLoadingStep('ocr', 'done');
+      showView('ocr-review');
+    } catch (err) {
+      console.error(err);
+      triggerErrorState(err.message || 'The server encountered an error processing the image. Please verify you uploaded a valid label image.');
     }
   }
 
-  function renderWarnList(ulEl, items) {
-    ulEl.innerHTML = '';
-    const arr = Array.isArray(items) ? items : [];
-    if (arr.length === 0) {
-      const li = document.createElement('li');
-      li.textContent = 'Always consult a medical professional before use.';
-      ulEl.appendChild(li);
-    } else {
-      arr.forEach(w => {
-        const li = document.createElement('li');
-        li.textContent = w;
-        ulEl.appendChild(li);
+  // 2. Text input analysis
+  async function triggerTextSearch(query) {
+    showView('loading');
+    updateLoadingStep('ocr', 'done'); // Skip OCR step since it's direct query
+    updateLoadingStep('rag', 'active');
+
+    try {
+      const formData = new FormData();
+      formData.append('text', query);
+
+      const res = await fetch('/api/analyze/text', {
+        method: 'POST',
+        body: formData
       });
-    }
-  }
+      const data = await res.json();
 
-  function renderTagCloud(containerEl, items, cls) {
-    containerEl.innerHTML = '';
-    const arr = Array.isArray(items) ? items : [];
-    if (arr.length === 0) {
-      containerEl.innerHTML = `<span style="font-size:0.82rem;color:var(--text-3);font-style:italic;">None listed</span>`;
-    } else {
-      arr.forEach(item => {
-        const tag = document.createElement('span');
-        tag.className = `tag ${cls}`;
-        tag.textContent = item;
-        containerEl.appendChild(tag);
-      });
-    }
-  }
+      if (!res.ok) {
+        throw new Error(data.detail || `Server status ${res.status}`);
+      }
 
-  function escHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+      updateLoadingStep('rag', 'done');
+      updateLoadingStep('llm', 'active');
 
-  // ── Copy Button ────────────────────────────────────────────
-  btnCopy.addEventListener('click', () => {
-    if (!lastResultData || !lastResultData.data) return;
-    const d = lastResultData.data;
-    const text = [
-      `Drug: ${d.drug_name}`,
-      `\nSynopsis:\n${d.synopsis}`,
-      `\nUses:\n${(d.uses || []).map(u => '• ' + u).join('\n')}`,
-      `\nSide Effects:\n${(d.side_effects || []).map(s => '• ' + s).join('\n')}`,
-      `\nKey Side Effects:\n${(d.key_side_effects || []).map(k => '⚠ ' + k).join('\n')}`,
-      `\nDosage:\n${d.dosage}`,
-      `\nWarnings:\n${(d.warnings || []).map(w => '! ' + w).join('\n')}`,
-      `\nDrug Interactions:\n${(d.drug_interactions || []).join(', ')}`,
-      `\nAlternatives:\n${(d.alternatives || []).join(', ')}`,
-      d.mfg_date ? `\nMFG Date: ${d.mfg_date}` : '',
-      d.expiry_date ? `\nExpiry: ${d.expiry_date}` : '',
-    ].filter(Boolean).join('');
+      if (data.success === false) {
+        throw new Error(data.error?.message || data.error || 'Medical database analysis failed.');
+      }
 
-    navigator.clipboard.writeText(text).then(() => {
-      const orig = btnCopy.innerHTML;
-      btnCopy.innerHTML = `<svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>`;
-      btnCopy.style.color = 'var(--green)';
+      state.lastResult = data;
+      renderDashboardReport(data.data);
+      updateLoadingStep('llm', 'done');
+      
       setTimeout(() => {
-        btnCopy.innerHTML = orig;
-        btnCopy.style.color = '';
-      }, 2000);
-    }).catch(() => {});
-  });
+        showView('dashboard');
+      }, 500);
 
-  // ── Retry Button ───────────────────────────────────────────
-  btnRetry.addEventListener('click', showEmpty);
+    } catch (err) {
+      console.error(err);
+      triggerErrorState(err.message || 'Failure performing drug database lookup.');
+    }
+  }
 
-  // ── Text Form Submit ───────────────────────────────────────
-  formText.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const textVal = document.getElementById('text-input').value.trim();
-    if (!textVal) return;
-
-    setButtonLoading(btnAnalyzeText, true);
-    showLoading();
+  // 3. Final Analysis from Verified OCR editor
+  async function triggerFinalAnalysis(text) {
+    showView('loading');
+    updateLoadingStep('ocr', 'done');
+    updateLoadingStep('rag', 'active');
 
     try {
-      const fd = new FormData();
-      fd.append('text', textVal);
+      const formData = new FormData();
+      formData.append('text', text);
 
-      const res = await fetch('/analyze/text', { method: 'POST', body: fd });
-      const json = await res.json();
+      const res = await fetch('/api/analyze/text', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(json.detail || `Server error ${res.status}`);
-      }
-      if (!json.success) {
-        throw new Error(json.error || 'Analysis returned failure status.');
+        throw new Error(data.detail || `Server status ${res.status}`);
       }
 
-      renderResults(json);
+      updateLoadingStep('rag', 'done');
+      updateLoadingStep('llm', 'active');
+
+      if (data.success === false) {
+        throw new Error(data.error?.message || data.error || 'Analysis verification failed.');
+      }
+
+      state.lastResult = data;
+      renderDashboardReport(data.data);
+      updateLoadingStep('llm', 'done');
+      
+      setTimeout(() => {
+        showView('dashboard');
+      }, 500);
+
     } catch (err) {
-      showError(err.message);
-    } finally {
-      setButtonLoading(btnAnalyzeText, false);
+      console.error(err);
+      triggerErrorState(err.message || 'Failure verifying OCR text coordinates.');
     }
-  });
+  }
 
-  // ── Image Form Submit ──────────────────────────────────────
-  formImage.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!imageInput.files.length) {
-      alert('Please select an image first.');
+  // Manage loading step visual updates
+  function updateLoadingStep(step, status) {
+    let element;
+    if (step === 'ocr') element = stepOcr;
+    else if (step === 'rag') element = stepRag;
+    else if (step === 'llm') element = stepLlm;
+
+    if (!element) return;
+
+    const checkIcon = element.querySelector('.check-icon');
+
+    if (status === 'active') {
+      element.classList.add('active');
+      element.classList.remove('done');
+      if (checkIcon) checkIcon.style.display = 'none';
+    } else if (status === 'done') {
+      element.classList.add('done');
+      element.classList.remove('active');
+      if (checkIcon) checkIcon.style.display = 'block';
+    }
+  }
+
+  // ─── RENDER MEDICAL DASHBOARD ───────────────────────────────
+  function renderDashboardReport(data) {
+    if (!data) return;
+
+    // Header Title Elements
+    dashDrugName.textContent = data.drug_name || 'Unknown';
+    dashGenericName.textContent = data.generic_name ? `(${data.generic_name})` : '';
+    dashDrugClass.textContent = `Class: ${data.drug_class || 'General Medicine'}`;
+    
+    // Synopsis
+    dashSynopsis.textContent = data.synopsis || 'No drug synopsis available.';
+
+    // Confidence Level badge styling
+    const level = data.confidence?.level || 'medium';
+    const score = Math.round((data.confidence?.score || 0.6) * 100);
+    dashConfidenceBadge.className = `confidence-box ${level}`;
+    dashConfidenceBadge.querySelector('span').textContent = `${level.toUpperCase()} CONFIDENCE (${score}%)`;
+
+    // Label coordinates metadata fields
+    dashMetaMfg.textContent = data.mfg_date || 'Not found';
+    dashMetaExp.textContent = data.expiry_date || 'Not found';
+    dashMetaBatch.textContent = data.batch_no || 'Not found';
+
+    // Highlight missing label coordinates
+    [dashMetaMfg, dashMetaExp, dashMetaBatch].forEach(field => {
+      if (field.textContent === 'Not found') {
+        field.classList.add('missing');
+      } else {
+        field.classList.remove('missing');
+      }
+    });
+
+    // Uses list
+    renderBulletList(dashUsesList, data.primary_uses, 'uses');
+
+    // Dosage & Intake Values
+    dashDosageAdult.textContent = data.dosage?.adult || 'As directed by physician';
+    dashDosageMax.textContent = data.dosage?.max_dose || 'Not specified';
+    
+    const food = data.dosage?.with_food;
+    dashDosageFood.textContent = food === true ? 'Take with food' : (food === false ? 'On empty stomach' : 'With or without food');
+    
+    // Handle nested dosage structures
+    let dosageDetailsText = data.dosage;
+    if (typeof data.dosage === 'object') {
+      dosageDetailsText = `Frequency: ${data.dosage.frequency || 'N/A'}. Administration: ${data.administration || 'N/A'}. adjustments: ${data.dosage.elderly || 'N/A'}`;
+    }
+    dashDosageDesc.textContent = dosageDetailsText || 'Consult drug labels packaging for complete details.';
+
+    // Side Effects Split Lists (Common vs Serious)
+    renderBulletList(dashCommonSeList, data.common_side_effects, 'common-se');
+    renderBulletList(dashSeriousSeList, data.serious_side_effects, 'serious-se');
+
+    // Warnings list
+    renderBulletList(dashWarningsList, data.warnings, 'warnings');
+
+    // Interactions flex-tags cloud
+    renderTagBadges(dashInteractionsTags, data.drug_interactions, 'teal');
+
+    // Alternatives flex-tags cloud
+    renderTagBadges(dashAlternativesTags, data.alternatives, 'indigo');
+
+    // Safety Advisories
+    dashSafetyPregnancy.textContent = data.pregnancy_safety || 'Category Unknown';
+    dashSafetyBreastfeeding.textContent = data.breastfeeding_safety || 'Consult pediatrician';
+    dashSafetyAlcohol.textContent = data.alcohol_interaction || 'Avoid alcohol';
+    dashSafetyDriving.textContent = data.driving_advisory || 'Caution advised';
+
+    // Storage, Missed dose & Overdose values
+    dashStorageVal.textContent = data.storage || 'Store in cool, dry place.';
+    dashOverdoseVal.textContent = data.overdose_guidance || 'Seek immediate medical attention.';
+    dashMissedDoseVal.textContent = data.missed_dose || 'Take as soon as possible unless next dose is close.';
+
+    // FAQ Cards Grid
+    renderFAQGrid(dashFaqList, data.faq);
+  }
+
+  // Bullet items renderer
+  function renderBulletList(ulElement, listData, type) {
+    ulElement.innerHTML = '';
+    const items = Array.isArray(listData) ? listData : [];
+    
+    if (items.length === 0) {
+      const li = document.createElement('li');
+      li.innerHTML = `<span>No recorded entries.</span>`;
+      ulElement.appendChild(li);
       return;
     }
 
-    setButtonLoading(btnAnalyzeImage, true);
-    showLoading();
-
-    try {
-      const fd = new FormData();
-      fd.append('file', imageInput.files[0]);
-
-      const res = await fetch('/analyze/image', { method: 'POST', body: fd });
-      const json = await res.json();
-
-      if (!res.ok) {
-        throw new Error(json.detail || `Server error ${res.status}`);
-      }
-      if (!json.success) {
-        throw new Error(json.error || 'Could not extract text from the image.');
+    items.forEach(itemText => {
+      const li = document.createElement('li');
+      
+      let svgMarkup = '';
+      if (type === 'uses') {
+        svgMarkup = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+      } else if (type === 'common-se' || type === 'warnings') {
+        svgMarkup = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+      } else if (type === 'serious-se') {
+        svgMarkup = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
       }
 
-      renderResults(json);
-    } catch (err) {
-      showError(err.message);
-    } finally {
-      setButtonLoading(btnAnalyzeImage, false);
+      li.innerHTML = `${svgMarkup}<span>${escapeHtml(itemText)}</span>`;
+      ulElement.appendChild(li);
+    });
+  }
+
+  // Badge tags renderer
+  function renderTagBadges(container, listData, colorClass) {
+    container.innerHTML = '';
+    const items = Array.isArray(listData) ? listData : [];
+
+    if (items.length === 0) {
+      container.innerHTML = `<span style="font-size: 0.85rem; font-style: italic; color: var(--text-muted);">None reported</span>`;
+      return;
+    }
+
+    items.forEach(itemText => {
+      const badge = document.createElement('span');
+      badge.className = `tag-badge ${colorClass}`;
+      badge.textContent = itemText;
+      container.appendChild(badge);
+    });
+  }
+
+  // FAQ dashboard grid renderer
+  function renderFAQGrid(container, faqData) {
+    container.innerHTML = '';
+    const items = Array.isArray(faqData) ? faqData : [];
+
+    if (items.length === 0) {
+      container.innerHTML = `<div class="faq-card-item" style="color: var(--text-muted); font-style: italic;">No FAQs available for this medication.</div>`;
+      return;
+    }
+
+    items.forEach(faq => {
+      const div = document.createElement('div');
+      div.className = 'faq-card-item';
+      div.innerHTML = `
+        <div class="fci-question">${escapeHtml(faq.q)}</div>
+        <div class="fci-answer">${escapeHtml(faq.a)}</div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe
+         .toString()
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+  }
+
+  // ─── ERROR HANDLING RECOVERY ──────────────────────────────
+  function triggerErrorState(message) {
+    errorMessageText.textContent = message || 'We failed to analyze this medicine due to a server connection timeout.';
+    showView('error');
+  }
+
+  btnErrorHome.addEventListener('click', () => {
+    clearUploadedFile();
+    showView('landing');
+  });
+
+  btnErrorRetry.addEventListener('click', () => {
+    if (state.activeFile) {
+      triggerImageOCRUpload(state.activeFile);
+    } else {
+      const val = searchInputField.value.trim();
+      if (val) triggerTextSearch(val);
+      else showView('landing');
     }
   });
 
-  // ── Init ───────────────────────────────────────────────────
-  showEmpty();
+  btnActionNewSearch.addEventListener('click', () => {
+    clearUploadedFile();
+    searchInputField.value = '';
+    showView('landing');
+  });
+
+  // ─── EXPORT CHANNELS ────────────────────────────────────────
+
+  // Copy structured report to clipboard
+  btnExportCopy.addEventListener('click', () => {
+    if (!state.lastResult || !state.lastResult.data) return;
+    
+    const d = state.lastResult.data;
+    const textReport = [
+      `DRUG REPORT: ${d.drug_name || 'N/A'} (${d.generic_name || 'N/A'})`,
+      `Class: ${d.drug_class || 'N/A'}`,
+      `Confidence: ${d.confidence?.level?.toUpperCase()} (${Math.round((d.confidence?.score || 0.6) * 100)}%)`,
+      `\n[Synopsis]\n${d.synopsis || 'N/A'}`,
+      `\n[Uses]\n${(d.primary_uses || []).map(u => '• ' + u).join('\n')}`,
+      `\n[Dosage]\nAdult: ${d.dosage?.adult || 'N/A'}\nMax Daily: ${d.dosage?.max_dose || 'N/A'}\nFood: ${d.dosage?.with_food ? 'With Food' : 'With or without food'}`,
+      `\n[Warnings]\n${(d.warnings || []).map(w => '⚠ ' + w).join('\n')}`,
+      `\n[Common Side Effects]\n${(d.common_side_effects || []).map(s => '• ' + s).join('\n')}`,
+      `\n[Serious Side Effects]\n${(d.serious_side_effects || []).map(s => '⚠ ' + s).join('\n')}`,
+      `\n[Interactions]\n${(d.drug_interactions || []).join(', ')}`,
+      `\n[Alternatives]\n${(d.alternatives || []).join(', ')}`
+    ].join('\n');
+
+    navigator.clipboard.writeText(textReport).then(() => {
+      const origText = btnExportCopy.innerHTML;
+      btnExportCopy.innerHTML = '<span>Copied!</span>';
+      btnExportCopy.style.color = 'var(--success)';
+      setTimeout(() => {
+        btnExportCopy.innerHTML = origText;
+        btnExportCopy.style.color = '';
+      }, 2000);
+    }).catch(err => {
+      console.error("Clipboard copy failed", err);
+    });
+  });
+
+  // Export as PDF via system window printing
+  btnExportPdf.addEventListener('click', () => {
+    window.print();
+  });
+
+  // Download raw JSON structure
+  btnExportJson.addEventListener('click', () => {
+    if (!state.lastResult) return;
+    
+    const jsonStr = JSON.stringify(state.lastResult, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    const drugNameSafe = (state.lastResult.data?.drug_name || 'drug_report')
+      .toLowerCase()
+      .replace(/\s+/g, '_');
+      
+    link.download = `drugfx_${drugNameSafe}.json`;
+    document.body.appendChild(link);
+    link.click();
+    
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  });
+
 });

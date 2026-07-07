@@ -1,25 +1,30 @@
-# DrugFX Requirements
-# Install with: pip install -r requirements.txt
+# ══════════════════════════════════════════════════════════
+# DrugFX — Production Requirements List
+# ══════════════════════════════════════════════════════════
 
-# --- Web Framework ---
+# ── Web Framework ─────────────────────────────────────────
 fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
 python-multipart>=0.0.9
 
-# --- AI / LLM ---
+# ── LLM Inference Providers ────────────────────────────────
+groq>=0.9.0
 google-genai>=0.5.0
 
-# --- RAG / Vector Search ---
-# Optional but improves search quality:
-# faiss-cpu>=1.7.4
-# sentence-transformers>=2.6.0
+# ── RAG / Vector Search ───────────────────────────────────
+# CPU implementation of FAISS vector store
+faiss-cpu>=1.7.4
+# Local semantic vector embeddings model
+sentence-transformers>=2.6.0
 
-# --- OCR ---
-# Optional but enables local Tesseract OCR:
-# pytesseract>=0.3.10
-# Pillow>=10.0.0
+# ── OCR & Image Processing ────────────────────────────────
+# Local Tesseract wrapper
+pytesseract>=0.3.10
+# Image resizing, filters, contrast enhancements
+Pillow>=10.0.0
 
-# --- Utilities ---
+# ── Configuration & Environment Utilities ─────────────────
 python-dotenv>=1.0.0
-pydantic>=2.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
 numpy>=1.24.0

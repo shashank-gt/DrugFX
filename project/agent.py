@@ -1,17 +1,19 @@
 """
 DrugFX AI Agent
 ===============
-Orchestrates the full pipeline:
-  1. Metadata extraction (drug name, MFG, expiry)
-  2. RAG context retrieval
-  3. LLM comprehensive analysis with multi-model fallback
-  4. Returns fully structured, validated response
+Orchestrates the full analysis pipeline:
+  1. Metadata extraction (drug name, MFG, expiry, batch)
+  2. RAG context retrieval with relevance scoring
+  3. LLM comprehensive analysis via provider abstraction
+  4. Confidence scoring based on RAG quality + model response
+  5. Returns fully structured, validated response
+
+All LLM calls go through llm_providers for Groq/Gemini swappability.
 """
 
 import os
 import re
 import json
-import time
 import logging
 from typing import Optional
 
@@ -25,61 +27,34 @@ try:
 except ImportError:
     pass
 
-# ─────────────────────────────────────────────────────────────
-# LLM Client — Lazy Initialized
-# ─────────────────────────────────────────────────────────────
-_gemini_client = None
-_genai_types = None
-_client_initialized = False
-
-
-def _get_gemini_client():
-    """Lazy-init the Gemini client so env vars are always resolved at call time."""
-    global _gemini_client, _genai_types, _client_initialized
-    if _client_initialized:
-        return _gemini_client, _genai_types
-
-    _client_initialized = True
-    api_key = os.environ.get("GEMINI_API_KEY", "")
-    try:
-        from google import genai as _genai_mod
-        from google.genai import types as _types
-        _genai_types = _types
-        if api_key and api_key not in ("your_gemini_api_key_here", ""):
-            _gemini_client = _genai_mod.Client(api_key=api_key)
-            logger.info("DrugFX Agent: Gemini client initialized successfully.")
-        else:
-            logger.warning("DrugFX Agent: GEMINI_API_KEY not set — will use mock responses.")
-    except ImportError:
-        logger.warning("DrugFX Agent: google-genai not installed. Run: pip install google-genai")
-
-    return _gemini_client, _genai_types
-
-
-def _get_client():
-    return _get_gemini_client()[0]
-
-
-def _get_types():
-    return _get_gemini_client()[1]
-
 
 # ─────────────────────────────────────────────────────────────
 # RAG Retrieval
 # ─────────────────────────────────────────────────────────────
-def _get_rag_context(query: str) -> str:
-    """Retrieve relevant drug context from knowledge base."""
+def _get_rag_context(query: str) -> tuple:
+    """
+    Retrieve relevant drug context from knowledge base.
+    Returns (context_string, avg_relevance_score).
+    """
     try:
-        from rag.retriever import retrieve_context
-        ctx = retrieve_context(query, top_k=3)
-        return ctx if ctx else ""
+        from rag.retriever import retrieve_context_with_scores
+        ctx, score = retrieve_context_with_scores(query, top_k=5)
+        return (ctx or "", score)
+    except ImportError:
+        try:
+            from rag.retriever import retrieve_context
+            ctx = retrieve_context(query, top_k=5)
+            return (ctx or "", 0.5)
+        except Exception as e:
+            logger.error(f"RAG retrieval failed: {e}")
+            return ("", 0.0)
     except Exception as e:
         logger.error(f"RAG retrieval failed: {e}")
-        return ""
+        return ("", 0.0)
 
 
 # ─────────────────────────────────────────────────────────────
-# Metadata Parser (MFG / Expiry from OCR text)
+# Metadata Parser (MFG / Expiry / Batch from OCR text)
 # ─────────────────────────────────────────────────────────────
 def _parse_label_metadata(text: str) -> dict:
     """
@@ -91,7 +66,7 @@ def _parse_label_metadata(text: str) -> dict:
         "mfg_date": None,
         "expiry_date": None,
         "batch_no": None,
-        "detected_drug_name": None
+        "detected_drug_name": None,
     }
 
     if not text:
@@ -133,7 +108,7 @@ def _parse_label_metadata(text: str) -> dict:
             break
 
     # --- Drug name: typically the first prominent word/line ---
-    lines = [ln.strip() for ln in text.split('\n') if ln.strip()]
+    lines = [ln.strip() for ln in text.split("\n") if ln.strip()]
     if lines:
         candidate = lines[0]
         if len(candidate) < 60:
@@ -143,67 +118,92 @@ def _parse_label_metadata(text: str) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────
-# LLM Call — Multi-model Fallback + Retry
+# LLM Call via Provider Abstraction
 # ─────────────────────────────────────────────────────────────
-def _call_gemini(prompt: str, system: str, json_mode: bool = True) -> str:
-    """
-    Calls Gemini with automatic model fallback cascade and retry on 429/rate-limit.
-    Tries in order: gemini-2.0-flash -> gemini-1.5-flash -> gemini-1.5-flash-8b
-    """
-    client = _get_client()
-    types = _get_types()
+_llm_provider = None
 
-    if not client:
-        logger.warning("_call_gemini: No Gemini client available.")
+
+def _get_provider():
+    """Lazy-init the LLM provider."""
+    global _llm_provider
+    if _llm_provider is not None:
+        return _llm_provider
+
+    try:
+        from llm_providers import get_llm_provider
+        _llm_provider = get_llm_provider()
+        logger.info(f"Agent: Using LLM provider: {_llm_provider.name}")
+    except Exception as e:
+        logger.error(f"Agent: Failed to initialize LLM provider: {e}")
+        _llm_provider = None
+
+    return _llm_provider
+
+
+def _call_llm(prompt: str, system: str, json_mode: bool = True) -> str:
+    """
+    Call the configured LLM provider.
+    Returns raw text response or empty string on failure.
+    """
+    provider = _get_provider()
+    if not provider or not provider.is_available():
+        logger.warning("Agent: LLM provider not available.")
         return ""
 
-    # Model cascade — real available models in order of preference
-    # 2.5 is confirmed working, 2.0 is quota exhausted
-    models_to_try = [
-        "gemini-2.5-flash",
-        "gemini-flash-latest",
+    try:
+        from config import settings
+        return provider.generate(
+            prompt=prompt,
+            system_prompt=system,
+            json_mode=json_mode,
+            temperature=settings.GROQ_TEMPERATURE,
+            max_tokens=settings.GROQ_MAX_TOKENS,
+        )
+    except Exception as e:
+        logger.error(f"Agent: LLM call failed: {e}")
+        return ""
+
+
+# ─────────────────────────────────────────────────────────────
+# Confidence Scoring
+# ─────────────────────────────────────────────────────────────
+def _calculate_confidence(rag_score: float, llm_response: dict) -> dict:
+    """
+    Calculate confidence based on:
+    - RAG retrieval relevance score
+    - Completeness of LLM response
+    """
+    # RAG component (0–1)
+    rag_component = min(1.0, rag_score)
+
+    # Completeness component: how many key fields are populated
+    key_fields = [
+        "drug_name", "generic_name", "synopsis", "primary_uses",
+        "common_side_effects", "dosage", "warnings",
     ]
+    filled = sum(1 for f in key_fields if llm_response.get(f))
+    completeness = filled / len(key_fields)
 
-    full_prompt = f"{system}\n\n{prompt}"
-    config_kwargs = {}
-    if json_mode and types:
-        config_kwargs["response_mime_type"] = "application/json"
-    cfg = types.GenerateContentConfig(**config_kwargs) if config_kwargs and types else None
+    # Weighted score
+    score = (rag_component * 0.4) + (completeness * 0.6)
+    score = round(min(1.0, max(0.0, score)), 2)
 
-    for model in models_to_try:
-        for attempt in range(2):  # Try each model up to 2x (once + one retry after 429)
-            try:
-                logger.info(f"_call_gemini: model={model} attempt={attempt + 1}")
-                response = client.models.generate_content(
-                    model=model,
-                    contents=full_prompt,
-                    config=cfg
-                )
-                text = response.text.strip() if response.text else ""
-                if text:
-                    logger.info(f"_call_gemini: Success with model={model}")
-                    return text
-            except Exception as e:
-                err_str = str(e)
-                is_quota = (
-                    "429" in err_str
-                    or "RESOURCE_EXHAUSTED" in err_str
-                    or "quota" in err_str.lower()
-                )
-                if is_quota:
-                    if attempt == 0:
-                        retry_wait = 4
-                        logger.warning(f"_call_gemini: 429 on {model} — waiting {retry_wait}s then retrying...")
-                        time.sleep(retry_wait)
-                    else:
-                        logger.warning(f"_call_gemini: Quota exhausted for {model} — trying next model.")
-                        break  # Move to next model
-                else:
-                    logger.error(f"_call_gemini: Non-quota error on {model}: {e}")
-                    break  # Non-quota error; don't retry, try next model
+    if score >= 0.75:
+        level = "high"
+    elif score >= 0.45:
+        level = "medium"
+    else:
+        level = "low"
 
-    logger.error("_call_gemini: All models failed or quota exhausted.")
-    return ""
+    source = "both" if rag_component > 0.3 else "llm"
+    if rag_component > 0.7 and completeness > 0.7:
+        source = "rag+llm"
+
+    return {
+        "level": level,
+        "score": score,
+        "source": source,
+    }
 
 
 # ─────────────────────────────────────────────────────────────
@@ -212,37 +212,104 @@ def _call_gemini(prompt: str, system: str, json_mode: bool = True) -> str:
 def _get_mock_response(drug_name: str = "Unknown Drug") -> dict:
     return {
         "drug_name": drug_name,
+        "generic_name": "",
+        "brand_names": [],
+        "drug_class": "",
+        "composition": "",
         "synopsis": (
             f"{drug_name} is a pharmaceutical compound. "
-            "AI analysis is currently unavailable because the API quota is temporarily exhausted. "
-            "Please wait a few minutes and try again, or update the GEMINI_API_KEY in the .env file."
+            "AI analysis is currently unavailable — the LLM provider may be temporarily "
+            "unreachable or the API key may not be configured. Please check your .env file "
+            "and try again."
         ),
-        "uses": ["Information temporarily unavailable"],
-        "side_effects": [
-            "Nausea or stomach upset",
-            "Dizziness or lightheadedness",
-            "Allergic reactions (rash, itching)",
-            "Headache",
-            "Consult prescribing information for complete side effects"
-        ],
-        "key_side_effects": [
-            "Severe allergic reaction (anaphylaxis)",
-            "Overdose risk — do not exceed recommended dose",
-            "Consult your pharmacist for drug-specific risks"
-        ],
-        "dosage": "As prescribed by your doctor. Do not self-medicate. Consult the package insert.",
+        "primary_uses": ["Information temporarily unavailable"],
+        "dosage": {
+            "adult": "Consult your prescriber",
+            "pediatric": "Consult your prescriber",
+            "elderly": "Consult your prescriber",
+            "frequency": "",
+            "max_dose": "",
+            "with_food": "",
+        },
+        "administration": "",
         "warnings": [
             "Consult a qualified medical professional before use",
             "Keep out of reach of children",
             "Do not exceed recommended dosage",
-            "Store as directed on packaging"
         ],
-        "drug_interactions": ["Consult pharmacist for interaction information"],
-        "alternatives": ["Consult your doctor for suitable alternatives"],
+        "contraindications": [],
+        "drug_interactions": [],
+        "pregnancy_safety": "Consult your doctor",
+        "breastfeeding_safety": "Consult your doctor",
+        "alcohol_interaction": "Consult your pharmacist",
+        "driving_advisory": "Consult your doctor",
+        "storage": "Store as directed on packaging",
+        "common_side_effects": [
+            "Nausea or stomach upset",
+            "Dizziness or lightheadedness",
+            "Headache",
+        ],
+        "serious_side_effects": [
+            "Severe allergic reaction (anaphylaxis)",
+            "Consult your pharmacist for drug-specific risks",
+        ],
+        "missed_dose": "Take the missed dose as soon as you remember unless it is close to your next dose.",
+        "overdose_guidance": "Seek emergency medical attention immediately.",
+        "faq": [],
+        "alternatives": [],
+        "confidence": {"level": "low", "score": 0.15, "source": "fallback"},
         "mfg_date": None,
         "expiry_date": None,
-        "batch_no": None
+        "batch_no": None,
     }
+
+
+# ─────────────────────────────────────────────────────────────
+# System Prompt — Expanded Schema
+# ─────────────────────────────────────────────────────────────
+SYSTEM_PROMPT = """You are DrugFX, an expert pharmaceutical AI agent. Your job is to analyze drug/medicine information and return a comprehensive, structured JSON response.
+
+IMPORTANT: Always return ONLY valid JSON with EXACTLY these fields:
+{
+  "drug_name": "Official drug name (brand and/or generic, e.g. 'Aspirin')",
+  "generic_name": "Generic/INN name (e.g. 'Acetylsalicylic acid')",
+  "brand_names": ["Known brand names"],
+  "drug_class": "Pharmacological class (e.g. 'NSAID', 'Antibiotic', 'Statin')",
+  "composition": "Active ingredients and strengths (e.g. 'Aspirin 500mg')",
+  "synopsis": "A 2-3 sentence professional summary: what this drug is, its class, and primary purpose",
+  "primary_uses": ["Detailed therapeutic uses — be thorough and specific"],
+  "dosage": {
+    "adult": "Typical adult dosage",
+    "pediatric": "Pediatric dosage or 'Not recommended' or 'Consult pediatrician'",
+    "elderly": "Elderly dosage adjustments",
+    "frequency": "How often (e.g. 'Every 4-6 hours')",
+    "max_dose": "Maximum daily dose",
+    "with_food": "Take with food? Before/after meals?"
+  },
+  "administration": "Route and method (oral, topical, injection, etc.)",
+  "warnings": ["Important warnings and precautions. ALWAYS include: 'Consult a qualified medical professional before use'"],
+  "contraindications": ["Conditions where this drug should NOT be used"],
+  "drug_interactions": ["Specific drugs, foods, or substances it interacts with"],
+  "pregnancy_safety": "Safety in pregnancy (e.g. 'Category C — use only if benefit outweighs risk')",
+  "breastfeeding_safety": "Safety during breastfeeding",
+  "alcohol_interaction": "Interaction with alcohol",
+  "driving_advisory": "Effect on driving/operating machinery",
+  "storage": "Storage conditions (temperature, light, moisture)",
+  "common_side_effects": ["Common/mild side effects — at least 5-8 entries"],
+  "serious_side_effects": ["Serious/dangerous side effects requiring medical attention — 3-5 entries"],
+  "missed_dose": "What to do if a dose is missed",
+  "overdose_guidance": "What to do in case of overdose",
+  "faq": [{"q": "Common question", "a": "Answer"}],
+  "alternatives": ["Alternative medications or treatments"]
+}
+
+Rules:
+- Be medically accurate, specific, and professional
+- common_side_effects should have 5-8 entries minimum
+- serious_side_effects should have 3-5 entries
+- Never leave arrays empty — always provide at least 2-3 items
+- faq should have 3-5 common questions
+- Return ONLY the JSON object, no commentary or markdown fences"""
 
 
 # ─────────────────────────────────────────────────────────────
@@ -250,7 +317,7 @@ def _get_mock_response(drug_name: str = "Unknown Drug") -> dict:
 # ─────────────────────────────────────────────────────────────
 def run_drug_analysis_agent(
     input_text: str,
-    label_metadata: Optional[dict] = None
+    label_metadata: Optional[dict] = None,
 ) -> dict:
     """
     Main agent function. Takes extracted drug text and optional label metadata,
@@ -261,7 +328,7 @@ def run_drug_analysis_agent(
         label_metadata: Pre-parsed dict with mfg_date, expiry_date, batch_no, detected_drug_name
 
     Returns:
-        dict with all structured drug information fields
+        dict with all structured drug information fields + confidence scoring
     """
     if not input_text or not input_text.strip():
         return _get_mock_response()
@@ -275,31 +342,9 @@ def run_drug_analysis_agent(
 
     # --- Step 3: RAG context retrieval ---
     logger.info(f"Agent: Retrieving RAG context for: {rag_query[:80]}")
-    rag_context = _get_rag_context(rag_query)
+    rag_context, rag_score = _get_rag_context(rag_query)
 
     # --- Step 4: Compose the LLM prompt ---
-    system_prompt = """You are DrugFX, an expert pharmaceutical AI agent. Your job is to analyze drug/medicine information and return a comprehensive, structured JSON response.
-
-IMPORTANT: Always return ONLY valid JSON with EXACTLY these fields:
-{
-  "drug_name": "Official drug name (brand and/or generic)",
-  "synopsis": "A 2-3 sentence professional summary: what this drug is, its pharmacological class, and primary therapeutic purpose",
-  "uses": ["Detailed therapeutic use 1", "use2", "use3"],
-  "side_effects": ["Complete list of known side effects — be thorough and specific"],
-  "key_side_effects": ["Only the 3-5 MOST CRITICAL side effects patients must urgently know — serious/dangerous ones"],
-  "dosage": "Detailed dosage: typical adult dose, frequency, max dose, with food or not, special populations",
-  "warnings": ["Important warnings, contraindications, and precautions. ALWAYS include: 'Consult a qualified medical professional before use'"],
-  "drug_interactions": ["Specific drugs, foods, or substances it interacts with"],
-  "alternatives": ["Alternative medications or treatments for the same condition"]
-}
-
-Rules:
-- Be medically accurate, specific, and professional
-- side_effects should have 6-10 entries minimum
-- key_side_effects should be the most serious/dangerous ones only (3-5)
-- Never leave arrays empty — always provide at least 2-3 items
-- Return ONLY the JSON object, no commentary"""
-
     mfg_expiry_note = ""
     if label_metadata.get("mfg_date") or label_metadata.get("expiry_date"):
         mfg_expiry_note = (
@@ -310,7 +355,7 @@ Rules:
     prompt = f"""Analyze this drug/medicine and provide comprehensive pharmaceutical information:
 
 DRUG INPUT:
-{input_text[:1000]}
+{input_text[:1500]}
 
 RETRIEVED KNOWLEDGE BASE CONTEXT:
 {rag_context if rag_context else 'No specific context retrieved — rely on your pharmaceutical knowledge.'}
@@ -319,44 +364,72 @@ RETRIEVED KNOWLEDGE BASE CONTEXT:
 Return a complete JSON object with all required fields."""
 
     # --- Step 5: Call LLM ---
-    logger.info("Agent: Calling Gemini LLM for drug analysis...")
-    llm_response = _call_gemini(prompt, system_prompt, json_mode=True)
+    logger.info("Agent: Calling LLM for drug analysis...")
+    llm_response = _call_llm(prompt, SYSTEM_PROMPT, json_mode=True)
 
     if not llm_response:
-        logger.warning("Agent: LLM call failed or quota exceeded — returning informative mock.")
+        logger.warning("Agent: LLM call failed — returning fallback response.")
         result = _get_mock_response(rag_query)
     else:
         try:
             # Strip any markdown code fences if model returned them
             clean = llm_response.strip()
             if clean.startswith("```"):
-                clean = re.sub(r'^```[a-z]*\n?', '', clean)
-                clean = re.sub(r'\n?```$', '', clean)
+                clean = re.sub(r"^```[a-z]*\n?", "", clean)
+                clean = re.sub(r"\n?```$", "", clean)
             result = json.loads(clean)
         except json.JSONDecodeError as e:
             logger.error(f"Agent: Failed to parse LLM JSON: {e} | Response: {llm_response[:200]}")
             result = _get_mock_response(rag_query)
 
-    # --- Step 6: Merge label metadata ---
+    # --- Step 6: Confidence scoring ---
+    confidence = _calculate_confidence(rag_score, result)
+    result["confidence"] = confidence
+
+    # --- Step 7: Merge label metadata ---
     result["mfg_date"] = label_metadata.get("mfg_date")
     result["expiry_date"] = label_metadata.get("expiry_date")
     result["batch_no"] = label_metadata.get("batch_no")
 
-    # --- Step 7: Fill any missing required keys ---
+    # --- Step 8: Fill any missing required keys ---
     defaults = {
         "drug_name": rag_query,
+        "generic_name": "",
+        "brand_names": [],
+        "drug_class": "",
+        "composition": "",
         "synopsis": "No synopsis available.",
-        "uses": [],
-        "side_effects": [],
-        "key_side_effects": [],
-        "dosage": "Consult your prescriber.",
+        "primary_uses": [],
+        "dosage": {"adult": "Consult your prescriber", "pediatric": "", "elderly": "",
+                   "frequency": "", "max_dose": "", "with_food": ""},
+        "administration": "",
         "warnings": ["Consult a qualified medical professional before use."],
+        "contraindications": [],
         "drug_interactions": [],
-        "alternatives": []
+        "pregnancy_safety": "",
+        "breastfeeding_safety": "",
+        "alcohol_interaction": "",
+        "driving_advisory": "",
+        "storage": "",
+        "common_side_effects": [],
+        "serious_side_effects": [],
+        "missed_dose": "",
+        "overdose_guidance": "",
+        "faq": [],
+        "alternatives": [],
     }
     for key, default_val in defaults.items():
         if key not in result or not result[key]:
             result[key] = default_val
 
-    logger.info(f"Agent: Analysis complete for '{result.get('drug_name', 'Unknown')}'")
+    # Handle legacy field mapping (backward compat)
+    if "uses" in result and "primary_uses" not in result:
+        result["primary_uses"] = result.pop("uses")
+    if "side_effects" in result and "common_side_effects" not in result:
+        result["common_side_effects"] = result.pop("side_effects")
+    if "key_side_effects" in result and "serious_side_effects" not in result:
+        result["serious_side_effects"] = result.pop("key_side_effects")
+
+    logger.info(f"Agent: Analysis complete for '{result.get('drug_name', 'Unknown')}' "
+                f"[confidence={confidence['level']}, score={confidence['score']}]")
     return result

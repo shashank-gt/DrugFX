@@ -11,23 +11,25 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 
-from utils.router import route_request
-from ocr import extract_text_from_image
+from agent import run_drug_analysis_agent
+from ocr import extract_text_structured
 
 def test_drug_text():
-    print("\n" + "="*40)
-    print("--- Testing Drug Analysis (Text) ---")
-    print("="*40)
+    print("\n" + "="*45)
+    print("--- Testing New Drug Analysis Agent (Text) ---")
+    print("="*45)
     try:
-        result = route_request("drug", "Cipladine")
+        # Test using the new agent entry point
+        result = run_drug_analysis_agent("Aspirin")
         print(json.dumps(result, indent=2))
+        print("SUCCESS: Text analysis completed successfully.")
     except Exception as e:
         print(f"FAILED: {e}")
 
 def test_ocr_flow():
-    print("\n" + "="*40)
-    print("--- Testing OCR Flow (Real image path) ---")
-    print("="*40)
+    print("\n" + "="*45)
+    print("--- Testing New OCR Flow (Real image path) ---")
+    print("="*45)
     
     # Use absolute path to ensure it's found regardless of where the script is run from
     image_path = os.path.join(PROJECT_ROOT, "mock_drug_label.png")
@@ -37,23 +39,27 @@ def test_ocr_flow():
         return
 
     print(f"Reading from: {image_path}")
-    extracted_text = extract_text_from_image(image_path)
-    print(f"Extracted Text: {extracted_text if extracted_text else '[EMPTY - OCR found no text]'}")
-
+    ocr_result = extract_text_structured(image_path)
+    print(f"Extracted OCR Result:")
+    print(f"  - Provider: {ocr_result.get('provider')}")
+    print(f"  - Confidence: {ocr_result.get('confidence')}")
+    print(f"  - Text Length: {len(ocr_result.get('text', ''))}")
+    
+    extracted_text = ocr_result.get('text', '')
     if not extracted_text.strip():
         print("Skipping drug analysis: No text was extracted from the image.")
         return
 
-    print("\nRouting extracted text to Drug module:")
-    
+    print("\nRouting extracted text to New Agent:")
     try:
-        result = route_request("drug", extracted_text)
+        result = run_drug_analysis_agent(extracted_text)
         print(json.dumps(result, indent=2))
+        print("SUCCESS: Image analysis OCR flow completed successfully.")
     except Exception as e:
         print(f"FAILED: {e}")
 
 if __name__ == "__main__":
-    print("Starting AI Pipeline Test (DrugFX Only)...")
+    print("Starting AI Pipeline Test (DrugFX v3.0)...")
     test_drug_text()
     test_ocr_flow()
     print("\nTest completed.")

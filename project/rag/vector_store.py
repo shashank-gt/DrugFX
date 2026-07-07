@@ -1,9 +1,11 @@
 """
 DrugFX Vector Store
 ====================
-Provides simple semantic search using:
+Provides semantic search using:
   - FAISS + sentence-transformers (if installed) — full semantic search
   - Keyword/TF-IDF fallback (always available) — no extra dependencies
+
+Returns results with similarity/relevance scores for confidence scoring.
 """
 
 import json
@@ -34,7 +36,7 @@ def _load_st_model():
     if not _HAS_FAISS:
         return None
     try:
-        logger.info("VectorStore: Loading sentence-transformers model (first run only)...")
+        logger.info("VectorStore: Loading sentence-transformers model...")
         _st_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
         logger.info("VectorStore: Model loaded and cached.")
     except Exception as e:
@@ -44,13 +46,13 @@ def _load_st_model():
 
 
 def _keyword_score(query: str, text: str) -> float:
-    """Simple keyword overlap score for fallback search."""
+    """Simple keyword overlap score for fallback search (0.0 to 1.0)."""
     q_words = set(query.lower().split())
     t_words = set(text.lower().split())
     if not q_words or not t_words:
         return 0.0
     overlap = q_words & t_words
-    return len(overlap) / (len(q_words) + 1)
+    return len(overlap) / (len(q_words) + 1.0)
 
 
 class DocumentStore:
@@ -80,10 +82,6 @@ class DocumentStore:
             logger.error(f"VectorStore: Failed to load data file: {e}")
             return
 
-        # Build FAISS index (deferred — only if model is already loaded or we force it)
-        # We do NOT load the ST model here to avoid slow startup.
-        # It will be loaded lazily on first search.
-
     def _ensure_index(self):
         """Build FAISS index lazily on first search."""
         if self.index is not None:
@@ -107,8 +105,15 @@ class DocumentStore:
 
     def search(self, query: str, top_k: int = 3) -> list:
         """
+        Legacy search interface. Returns a list of documents.
+        """
+        results_with_scores = self.search_with_scores(query, top_k)
+        return [doc for doc, _ in results_with_scores]
+
+    def search_with_scores(self, query: str, top_k: int = 3) -> list:
+        """
         Search for top_k most relevant documents.
-        Uses FAISS semantic search if available, else keyword overlap.
+        Returns a list of tuples (document_metadata_dict, confidence_score_0_to_1).
         """
         top_k = int(top_k)
         if not self.metadata:
@@ -127,35 +132,45 @@ class DocumentStore:
                     np.array(q_emb, dtype='float32'),
                     min(top_k, len(self.metadata))
                 )
+                
                 results = []
-                for i in indices[0]:
+                for dist, i in zip(distances[0], indices[0]):
                     if 0 <= i < len(self.metadata):
-                        results.append(self.metadata[i])
+                        # Convert L2 distance to a 0-1 similarity score.
+                        # For L2 normalized embeddings, L2 distance ranges from 0 to 4.
+                        # Similarity = 1 - (distance / 4)
+                        score = max(0.0, min(1.0, 1.0 - (float(dist) / 4.0)))
+                        results.append((self.metadata[i], score))
                 return results
             except Exception as e:
                 logger.error(f"VectorStore: FAISS search failed: {e}")
 
         # ── Keyword fallback ──────────────────────────────────
-        scored = [
-            (self.metadata[i], _keyword_score(query, self.texts[i]))
-            for i in range(len(self.texts))
-        ]
+        scored = []
+        for i in range(len(self.texts)):
+            score = _keyword_score(query, self.texts[i])
+            if score > 0.0:
+                scored.append((self.metadata[i], score))
+        
+        # Sort by score descending
         scored.sort(key=lambda x: x[1], reverse=True)
-        return [item for item, score in scored[:top_k]]
+        
+        # If no keyword match, just return top_k with very low score
+        if not scored:
+            return [(item, 0.1) for item in self.metadata[:top_k]]
+            
+        return scored[:top_k]
 
-
-def build_vector_store(data_texts: list):
-    """Legacy helper — kept for backward compatibility."""
-    model = _load_st_model()
-    if model is None:
-        return None
-    try:
-        import numpy as np
-        embeddings = model.encode(data_texts, show_progress_bar=False)
-        dim = embeddings.shape[1]
-        index = faiss.IndexFlatL2(dim)
-        index.add(np.array(embeddings, dtype='float32'))
-        return index
-    except Exception as e:
-        logger.error(f"build_vector_store failed: {e}")
-        return None
+    def suggest(self, query: str, limit: int = 8) -> list:
+        """
+        Returns simple suggestions matching title of the drug/medicine.
+        """
+        if not query:
+            return []
+        query_lower = query.lower().strip()
+        matches = []
+        for meta in self.metadata:
+            title = meta.get('title', '')
+            if query_lower in title.lower():
+                matches.append(title)
+        return matches[:limit]

@@ -1,333 +1,825 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DrugFX — AI Drug Intelligence</title>
-  <meta name="description" content="DrugFX uses cutting-edge AI agents to analyze drug labels and provide comprehensive pharmaceutical intelligence including side effects, dosage, warnings, and more." />
+  <title>DrugFX — AI-Powered Medicine Intelligence & Label Extraction</title>
+  
+  <meta name="description" content="DrugFX is an AI-powered medicine intelligence platform that structures details like generic name, side effects, dosage, and warnings from label images or text." />
+  <meta name="keywords" content="drug scanner, medicine identifier, AI prescription, drug side effects, medicine search, RAG, FastAPI, Groq" />
+  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css?v=2" />
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
 
-  <!-- Animated Background -->
-  <div class="bg-orb orb-1"></div>
-  <div class="bg-orb orb-2"></div>
-  <div class="bg-orb orb-3"></div>
-  <div class="noise-overlay"></div>
+  <!-- Screen Reader Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Animated Background Orbs -->
+  <div class="bg-orb orb-primary" aria-hidden="true"></div>
+  <div class="bg-orb orb-accent" aria-hidden="true"></div>
 
   <!-- App Shell -->
-  <div class="app-shell">
+  <div class="app-container">
 
-    <!-- ── HEADER ───────────────────────────────────── -->
+    <!-- ── NAVIGATION HEADER ───────────────────────────────── -->
     <header class="app-header">
       <div class="header-inner">
-        <div class="logo-wrap">
-          <div class="logo-icon">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="32" height="32" rx="8" fill="url(#logoGrad)"/>
-              <path d="M10 16h12M16 10v12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-              <circle cx="16" cy="16" r="5" stroke="white" stroke-width="2"/>
-              <defs>
-                <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#6366f1"/>
-                  <stop offset="1" stop-color="#a855f7"/>
-                </linearGradient>
-              </defs>
+        <a href="#" class="logo-link" id="logo-home-link" aria-label="DrugFX Home">
+          <svg class="logo-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="var(--primary)"/>
+            <path d="M10 16H22M16 10V22" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="16" cy="16" r="4.5" stroke="white" stroke-width="1.8"/>
+          </svg>
+          <div class="logo-text">Drug<span class="logo-tag">FX</span></div>
+        </a>
+
+        <nav class="header-nav" aria-label="Main Navigation">
+          <a href="#" class="nav-link active" id="nav-home">Home</a>
+          <a href="#" class="nav-link" id="nav-how">How it Works</a>
+          <a href="#" class="nav-link" id="nav-features">Features</a>
+          <a href="#" class="nav-link" id="nav-faq">FAQ</a>
+        </nav>
+
+        <div class="header-actions">
+          <!-- Dark/Light Theme Toggle -->
+          <button class="theme-toggle" id="theme-toggle-btn" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+            <!-- Moon Icon (Dark Mode) -->
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
-          </div>
-          <div class="logo-text">
-            <span class="logo-brand">Drug<span class="logo-fx">FX</span></span>
-            <span class="logo-tag">AI Drug Intelligence</span>
-          </div>
-        </div>
-        <div class="header-badges">
-          <span class="hbadge hbadge--ai">✦ AI Agent</span>
-          <span class="hbadge hbadge--rag">◈ RAG Powered</span>
+            <!-- Sun Icon (Light Mode) -->
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.72" x2="5.64" y2="18.3"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+          
+          <button class="btn-primary-sm" id="btn-header-analyze">Start Analysis</button>
         </div>
       </div>
     </header>
 
-    <!-- ── MAIN ────────────────────────────────────── -->
-    <main class="app-main">
+    <!-- ── MAIN CONTENT SHELL ──────────────────────────────── -->
+    <main id="main-content" class="main-content-area" role="main">
 
-      <!-- LEFT PANEL: Input -->
-      <aside class="panel panel--input glass">
-
-        <div class="panel-title">
-          <span class="pt-icon">⌖</span>
-          <span>Analysis Input</span>
-        </div>
-
-        <div class="mode-switcher" role="tablist">
-          <button class="mode-btn active" id="btn-text" role="tab" aria-selected="true" aria-controls="form-text" data-mode="text">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
-            Text Query
-          </button>
-          <button class="mode-btn" id="btn-image" role="tab" aria-selected="false" aria-controls="form-image" data-mode="image">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
-            Scan Label
-          </button>
-        </div>
-
-        <!-- TEXT FORM -->
-        <form id="form-text" class="input-form visible" autocomplete="off">
-          <label for="text-input" class="field-label">Drug Name or Description</label>
-          <div class="textarea-wrap">
-            <textarea
-              id="text-input"
-              name="text"
-              placeholder="e.g. Aspirin 500mg, Metformin, Ibuprofen tablets..."
-              rows="5"
-              required
-            ></textarea>
-            <div class="textarea-glow"></div>
+      <!-- ===================================================
+           VIEW 1: LANDING PAGE (HOME)
+           =================================================== -->
+      <section id="view-landing" class="app-view">
+        
+        <!-- Hero Section -->
+        <div class="landing-hero">
+          <div class="hero-tagline">
+            ✦ AI Medicine Intelligence Platform
           </div>
-          <p class="field-hint">Enter any drug name, generic name, or paste label text.</p>
-          <button type="submit" class="btn-analyze" id="btn-analyze-text">
-            <span class="btn-label">
-              <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-              Analyze with AI
-            </span>
-            <span class="btn-loading">
-              <span class="spinner"></span>
-              Analyzing...
-            </span>
-          </button>
-        </form>
+          <h1 class="hero-title">Understand Any Medicine In Seconds</h1>
+          <p class="hero-subtitle">
+            Upload a label, prescription image, or search by drug name. Get verified side effects, safety warnings, dosage, and medical instructions instantly.
+          </p>
 
-        <!-- IMAGE FORM -->
-        <form id="form-image" class="input-form hidden" enctype="multipart/form-data">
-          <label class="field-label">Upload Drug Label Image</label>
-          <div class="upload-zone" id="upload-zone">
-            <input type="file" id="image-input" name="file" accept="image/*" required />
-            <div class="upload-content" id="upload-content">
-              <div class="upload-icon-wrap">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="48" height="48" rx="12" fill="rgba(99,102,241,0.1)"/>
-                  <path d="M24 14v12M24 14l-4 4M24 14l4 4" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M14 30v2a2 2 0 002 2h16a2 2 0 002-2v-2" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <p class="upload-text">Drop image here or <span class="upload-link">browse</span></p>
-              <p class="upload-hint">Supports JPG, PNG, WEBP — drug labels, medicine strips</p>
+          <!-- Search & Action Bar -->
+          <div class="hero-action-container">
+            <div class="search-input-wrap">
+              <svg class="search-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input 
+                type="text" 
+                id="search-input-field" 
+                class="hero-search-input" 
+                placeholder="Type medicine name (e.g. Paracetamol, Metformin, Lipitor)..." 
+                aria-label="Search medicine name"
+                autocomplete="off"
+              />
+              
+              <!-- Auto-suggest Dropdown -->
+              <div class="autocomplete-suggestions" id="suggestions-box" role="listbox" aria-label="Medicine search suggestions"></div>
             </div>
-            <div class="upload-preview hidden" id="upload-preview">
-              <img id="preview-img" src="#" alt="Preview" />
-              <div class="preview-info">
-                <span class="preview-name" id="preview-name">filename.jpg</span>
-                <button type="button" class="preview-clear" id="preview-clear">✕ Clear</button>
-              </div>
-            </div>
-          </div>
-          <button type="submit" class="btn-analyze" id="btn-analyze-image">
-            <span class="btn-label">
-              <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
-              Extract &amp; Analyze
-            </span>
-            <span class="btn-loading">
-              <span class="spinner"></span>
-              Processing...
-            </span>
-          </button>
-        </form>
 
-        <!-- Model Info -->
-        <div class="model-info">
-          <div class="model-chip">
-            <span class="model-dot"></span>
-            <span>Gemini 2.0 Flash</span>
-          </div>
-          <span class="model-sep">·</span>
-          <div class="model-chip">
-            <span class="model-dot model-dot--green"></span>
-            <span>RAG Active</span>
-          </div>
-        </div>
-
-      </aside>
-
-      <!-- RIGHT PANEL: Results -->
-      <section class="panel panel--results glass" id="results-panel">
-
-        <!-- Empty State -->
-        <div class="empty-state" id="empty-state">
-          <div class="empty-pulse">
-            <div class="pulse-ring"></div>
-            <div class="pulse-ring pulse-ring--2"></div>
-            <div class="empty-icon-inner">
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4 2"/><path d="M20 12v8M20 24v2" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/></svg>
-            </div>
-          </div>
-          <h3 class="empty-title">Ready to Analyze</h3>
-          <p class="empty-desc">Enter a drug name or upload a label image to get comprehensive AI-powered pharmaceutical insights.</p>
-          <div class="empty-features">
-            <div class="ef-item"><span>✦</span> Side effect synopsis</div>
-            <div class="ef-item"><span>◈</span> Key warnings &amp; interactions</div>
-            <div class="ef-item"><span>⊕</span> Label data extraction</div>
-          </div>
-        </div>
-
-        <!-- Loading State -->
-        <div class="loading-state hidden" id="loading-state">
-          <div class="loading-orb"></div>
-          <div class="loading-text">
-            <h3>AI Agent Processing</h3>
-            <div class="loading-steps" id="loading-steps">
-              <div class="ls-item active" id="ls-1">
-                <span class="ls-dot"></span>
-                <span>Parsing input...</span>
-              </div>
-              <div class="ls-item" id="ls-2">
-                <span class="ls-dot"></span>
-                <span>Retrieving knowledge base...</span>
-              </div>
-              <div class="ls-item" id="ls-3">
-                <span class="ls-dot"></span>
-                <span>Generating analysis...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Results Content -->
-        <div class="results-wrap hidden" id="results-wrap">
-
-          <!-- Drug Header -->
-          <div class="drug-header" id="drug-header">
-            <div class="drug-header-main">
-              <div class="drug-icon-wrap">
-                <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="url(#dh)"/><path d="M16 8v16M8 16h16" stroke="white" stroke-width="2.5" stroke-linecap="round"/><defs><linearGradient id="dh" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs></svg>
-              </div>
-              <div>
-                <h2 class="drug-name" id="drug-name">Drug Name</h2>
-                <div class="result-badges" id="result-badges">
-                  <span class="rbadge rbadge--success" id="status-badge">Analysis Complete</span>
-                </div>
-              </div>
-            </div>
-            <button class="btn-copy" id="btn-copy" title="Copy results">
-              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z"/><path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"/></svg>
+            <button class="btn-search-trigger" id="btn-search-search" aria-label="Search">
+              <span>Search</span>
+            </button>
+            
+            <button class="btn-upload-shortcut" id="btn-upload-trigger-shortcut" aria-label="Scan label">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              <span>Scan Label</span>
             </button>
           </div>
 
-          <!-- Results Scroll Area -->
-          <div class="results-scroll" id="results-scroll">
+          <!-- Example Searches -->
+          <div class="example-searches">
+            <span class="example-label">Try searching for:</span>
+            <button class="chip" data-query="Aspirin">Aspirin</button>
+            <button class="chip" data-query="Metformin">Metformin</button>
+            <button class="chip" data-query="Atorvastatin">Atorvastatin</button>
+            <button class="chip" data-query="Amoxicillin">Amoxicillin</button>
+            <button class="chip" data-query="Cetirizine">Cetirizine</button>
+          </div>
+        </div>
 
-            <!-- OCR Extracted Text (image only) -->
-            <div class="result-section hidden" id="section-ocr">
-              <div class="section-header sh--info">
-                <span class="sh-icon">◉</span>
-                <span class="sh-title">OCR Extracted Label Text</span>
+        <!-- Hidden input for file upload -->
+        <input type="file" id="file-uploader-input" accept="image/*,application/pdf" style="display: none;" />
+
+        <!-- Interactive Drag & Drop Area -->
+        <div class="hero-dragzone" id="drag-drop-zone" role="button" tabindex="0" aria-label="Upload label image or PDF">
+          <!-- State 1: Ready to drop -->
+          <div class="dragzone-preview-wrap" id="dragzone-idle-state" style="display: flex;">
+            <div class="dragzone-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 16 12 12 8 16"></polyline>
+                <line x1="12" y1="12" x2="12" y2="21"></line>
+                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+                <polyline points="16 16 12 12 8 16"></polyline>
+              </svg>
+            </div>
+            <p class="dragzone-text">Drag &amp; drop medicine label or <span class="dragzone-link">browse files</span></p>
+            <p class="dragzone-hint">Supports drug labels, strips, prescriptions, PDF reports (max 10MB)</p>
+          </div>
+
+          <!-- State 2: File Selected preview -->
+          <div class="dragzone-preview-wrap" id="dragzone-selected-state" style="display: none;">
+            <img class="preview-thumbnail" id="preview-thumbnail-img" src="" alt="Medicine label preview" />
+            <div class="preview-details">
+              <span class="preview-filename" id="preview-filename-text">filename.jpg</span>
+              <button class="btn-clear-preview" id="btn-clear-file" aria-label="Remove uploaded file">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Process Steps section -->
+        <div class="landing-steps" id="how-it-works-section">
+          <h2 class="section-title-centered">How DrugFX Works</h2>
+          <div class="steps-grid">
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <h3 class="step-title">Upload or Search</h3>
+              <p class="step-desc">Type a drug name or take a photo of a medicine strip, box label, or active ingredient details.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <h3 class="step-title">AI Processing</h3>
+              <p class="step-desc">Advanced OCR reads the image. The platform searches the FAISS medical database and compiles trustworthy RAG context.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <h3 class="step-title">Understand Safely</h3>
+              <p class="step-desc">View a clear dashboard of uses, dosages, warnings, and alternatives without getting lost in complex medical jargon.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Features grid -->
+        <div class="landing-features" id="features-section">
+          <h2 class="section-title-centered">Why Trust DrugFX</h2>
+          <div class="features-grid">
+            <div class="feature-item-card">
+              <div class="feature-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
               </div>
-              <div class="ocr-text-box" id="ocr-text"></div>
+              <h3 class="feature-card-title">Retrieval-Augmented Generation (RAG)</h3>
+              <p class="feature-card-desc">Instead of guessing, the AI queries a verified medical database using vector embeddings to anchor responses in true facts.</p>
+            </div>
+            <div class="feature-item-card">
+              <div class="feature-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </div>
+              <h3 class="feature-card-title">Confidence Transparency</h3>
+              <p class="feature-card-desc">Every report details if the AI is highly confident or if information is sparse, warning you of uncertainty honestly.</p>
+            </div>
+            <div class="feature-item-card">
+              <div class="feature-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </div>
+              <h3 class="feature-card-title">OCR Corrections</h3>
+              <p class="feature-card-desc">Verify what text the scanner found on the label. Fix spelling errors or missing dosages before initiating the analysis.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Privacy & Security -->
+        <div class="landing-security">
+          <div class="security-inner">
+            <div class="security-content">
+              <span class="security-label">Privacy First</span>
+              <h2 class="security-title">Your Medical Data Remains Private</h2>
+              <p class="security-desc">
+                We believe health checks must be private. DrugFX processes all uploads securely. Images are analyzed in memory and immediately discarded. No personal identity is ever linked or saved to standard profiles.
+              </p>
+              <div class="security-points">
+                <div class="security-point">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>No storage of labels</span>
+                </div>
+                <div class="security-point">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>GDPR-compliant security</span>
+                </div>
+                <div class="security-point">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Encrypted transit</span>
+                </div>
+                <div class="security-point">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>In-memory analysis</span>
+                </div>
+              </div>
+            </div>
+            <div class="security-visual">
+              <div class="shield-graphic" aria-hidden="true">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ accordion list -->
+        <div class="landing-faq" id="faq-section">
+          <h2 class="section-title-centered">Frequently Asked Questions</h2>
+          <div class="faq-list">
+            <div class="faq-item">
+              <button class="faq-question">
+                <span>Can DrugFX diagnose a condition or prescribe pills?</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="faq-answer-content">
+                  No. DrugFX provides informational intelligence retrieved from medical documentation. It does not replace medical advice, diagnosis, treatment, or clinical consultation.
+                </div>
+              </div>
             </div>
 
-            <!-- Label Metadata (MFG / Exp / Batch) -->
-            <div class="result-section hidden" id="section-meta">
-              <div class="section-header sh--meta">
-                <span class="sh-icon">⊕</span>
-                <span class="sh-title">Label Information</span>
+            <div class="faq-item">
+              <button class="faq-question">
+                <span>How accurate is the label scanning (OCR)?</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="faq-answer-content">
+                  Our dual-OCR pipeline uses local engines first and falls back to advanced visual LLM processors for blurry text. However, you can review and correct what text was found before initiating the medical intelligence pipeline to guarantee accuracy.
+                </div>
               </div>
-              <div class="meta-grid" id="meta-grid"></div>
             </div>
 
-            <!-- Synopsis -->
-            <div class="result-section" id="section-synopsis">
-              <div class="section-header sh--purple">
-                <span class="sh-icon">✦</span>
-                <span class="sh-title">Drug Synopsis</span>
+            <div class="faq-item">
+              <button class="faq-question">
+                <span>Where does the drug information come from?</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="faq-answer-content">
+                  We use Retrieval-Augmented Generation (RAG). The system fetches context from our indexed knowledge base comprising FDA labels, clinical sheets, and standard drug databases, and packages it into prompts for the Groq inference engine.
+                </div>
               </div>
-              <div class="synopsis-card" id="synopsis-text"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           VIEW 2: OCR REVIEW & CORRECTION
+           =================================================== -->
+      <section id="view-ocr-review" class="app-view hidden">
+        <div class="ocr-review-container">
+          <div class="card-container">
+            <h2 class="view-heading">Verify Extracted Label Text</h2>
+            <p class="view-subheading">Review the text read from the image. You can correct typos or missing values before triggering the AI report.</p>
+
+            <div class="ocr-split-layout">
+              <img id="review-original-img" class="ocr-original-thumbnail" src="" alt="Original medicine label uploaded" />
+              <textarea id="review-text-editor" class="textarea-review-editor" aria-label="Editable OCR text"></textarea>
             </div>
 
-            <!-- Key Side Effects (Critical) -->
-            <div class="result-section" id="section-key-se">
-              <div class="section-header sh--danger">
-                <span class="sh-icon">⚠</span>
-                <span class="sh-title">Critical Side Effects</span>
+            <div class="ocr-stats-row">
+              <div class="ocr-stat-chip">
+                <span>OCR Quality:</span>
+                <strong id="ocr-confidence-text">85% Confidence</strong>
               </div>
-              <div class="key-se-grid" id="key-se-grid"></div>
+              <div class="ocr-stat-chip">
+                <span>Engine:</span>
+                <strong id="ocr-provider-text">Tesseract OCR</strong>
+              </div>
             </div>
 
-            <!-- Full Side Effects -->
-            <div class="result-section" id="section-se">
-              <div class="section-header sh--orange">
-                <span class="sh-icon">◈</span>
-                <span class="sh-title">All Side Effects</span>
+            <div class="ocr-review-actions">
+              <button class="btn-secondary" id="btn-ocr-cancel">Cancel</button>
+              <button class="btn-primary" id="btn-ocr-proceed">
+                <span>Analyze Verified Text</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           VIEW 3: AI PIPELINE PROCESSING / LOADING
+           =================================================== -->
+      <section id="view-loading" class="app-view hidden">
+        <div class="processing-container">
+          <div class="loading-radar" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+          </div>
+          <h2 class="processing-title">Analyzing Medication Label</h2>
+          <p class="processing-subtitle">DrugFX is extracting drug characteristics, retrieving reference materials, and formatting recommendations...</p>
+
+          <div class="processing-timeline">
+            <div class="timeline-step" id="step-ocr">
+              <div class="step-indicator">
+                <svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="display: none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </div>
-              <ul class="effect-list" id="se-list"></ul>
+              <div class="step-text">Image OCR and character extraction</div>
+            </div>
+            
+            <div class="timeline-step" id="step-rag">
+              <div class="step-indicator">
+                <svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="display: none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </div>
+              <div class="step-text">Retrieving reference data from database</div>
             </div>
 
-            <!-- Uses -->
-            <div class="result-section" id="section-uses">
-              <div class="section-header sh--green">
-                <span class="sh-icon">✓</span>
-                <span class="sh-title">Therapeutic Uses</span>
+            <div class="timeline-step" id="step-llm">
+              <div class="step-indicator">
+                <svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="display: none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </div>
-              <ul class="effect-list effect-list--uses" id="uses-list"></ul>
+              <div class="step-text">Formatting structured response with Groq LLM</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           VIEW 4: AI ANALYSIS DASHBOARD
+           =================================================== -->
+      <section id="view-dashboard" class="app-view hidden">
+        <div class="analysis-dashboard">
+          
+          <!-- Sticky Sidebar Navigation -->
+          <aside class="dashboard-nav-sidebar" aria-label="Dashboard sections navigation">
+            <div class="sidebar-title">Sections</div>
+            <ul class="sidebar-menu-list">
+              <li><button class="sidebar-menu-btn active" data-target="sec-overview">Overview</button></li>
+              <li><button class="sidebar-menu-btn" data-target="sec-label">Label Information</button></li>
+              <li><button class="sidebar-menu-btn" data-target="sec-uses">Therapeutic Uses</button></li>
+              <li><button class="sidebar-menu-btn" data-target="sec-dosage">Dosage &amp; Method</button></li>
+              <li><button class="sidebar-menu-btn" data-target="sec-side-effects">Side Effects</button></li>
+              <li><button class="sidebar-menu-btn" data-target="sec-warnings">Warnings</button></li>
+              <li><button class="sidebar-menu-btn" data-target="sec-interactions">Interactions</button></li>
+              <li><button class="sidebar-menu-btn" data-target="sec-safety">Safety Advisories</button></li>
+              <li><button class="sidebar-menu-btn" data-target="sec-storage">Storage &amp; Overdose</button></li>
+              <li><button class="sidebar-menu-btn" data-target="sec-faq">FAQ</button></li>
+            </ul>
+          </aside>
+
+          <!-- Main Dashboard Dashboard -->
+          <div class="dashboard-content">
+            
+            <!-- Dashboard Title Card -->
+            <div class="dashboard-header-card" id="sec-overview">
+              <div class="dh-left">
+                <div class="dh-pill-icon">MEDICINE REPORT</div>
+                <div class="dh-title-row">
+                  <h1 class="dh-drug-name" id="dash-drug-name">Paracetamol</h1>
+                  <span class="dh-generic-name" id="dash-generic-name">(Acetaminophen)</span>
+                </div>
+                <div class="dh-meta-subline">
+                  <span id="dash-drug-class">Class: Analgesic &amp; Antipyretic</span>
+                  <span>•</span>
+                  <span>Confidence:</span>
+                  <div class="confidence-box high" id="dash-confidence-badge">
+                    <span>High Confidence</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="dh-actions-panel">
+                <button class="btn-action-outline" id="btn-export-copy" title="Copy to clipboard">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <span>Copy</span>
+                </button>
+                <button class="btn-action-outline" id="btn-export-pdf" title="Download Report as PDF">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>PDF</span>
+                </button>
+                <button class="btn-action-outline" id="btn-export-json" title="Download Raw JSON">
+                  <span>JSON</span>
+                </button>
+                <button class="btn-action-outline" id="btn-action-new-search" style="border-color: var(--primary); color: var(--primary);">
+                  <span>New Search</span>
+                </button>
+              </div>
             </div>
 
-            <!-- Dosage -->
-            <div class="result-section" id="section-dosage">
-              <div class="section-header sh--blue">
-                <span class="sh-icon">⊗</span>
-                <span class="sh-title">Dosage &amp; Administration</span>
+            <!-- Disclaimer -->
+            <div class="disclaimer-card">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <div class="disclaimer-text">
+                <strong>Medical Disclaimer:</strong> DrugFX provides informational assistance and does not replace professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional before making medical decisions.
               </div>
-              <div class="dosage-card" id="dosage-text"></div>
+            </div>
+
+            <!-- Synopsis Section -->
+            <div class="grid-card">
+              <p class="text-block-large" id="dash-synopsis">
+                Paracetamol is an analgesic and antipyretic drug used to relieve mild to moderate pain and reduce fever. It is one of the most widely used over-the-counter medications globally.
+              </p>
+            </div>
+
+            <!-- Label Metadata (EXP / MFG / BATCH) -->
+            <div class="grid-card dashboard-grid-section" id="sec-label">
+              <div class="card-section-header">
+                <div class="card-title-wrap">
+                  <div class="card-section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </div>
+                  <h2 class="card-section-title">Label Information</h2>
+                </div>
+              </div>
+
+              <div class="label-info-grid">
+                <div class="label-info-item">
+                  <div class="li-label">Manufacturing Date</div>
+                  <div class="li-value" id="dash-meta-mfg">Oct 2025</div>
+                </div>
+                <div class="label-info-item">
+                  <div class="li-label">Expiry Date</div>
+                  <div class="li-value" id="dash-meta-exp">Sep 2027</div>
+                </div>
+                <div class="label-info-item">
+                  <div class="li-label">Batch / Lot Number</div>
+                  <div class="li-value" id="dash-meta-batch">B9410A</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Therapeutic Uses -->
+            <div class="grid-card dashboard-grid-section" id="sec-uses">
+              <div class="card-section-header">
+                <div class="card-title-wrap">
+                  <div class="card-section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <h2 class="card-section-title">Therapeutic Uses</h2>
+                </div>
+              </div>
+              <ul class="icon-list success-bullets" id="dash-uses-list">
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Relief of mild to moderate pain (headache, toothache, muscle aches)</span>
+                </li>
+              </li>
+              </ul>
+            </div>
+
+            <!-- Dosage & Method -->
+            <div class="grid-card dashboard-grid-section" id="sec-dosage">
+              <div class="card-section-header">
+                <div class="card-title-wrap">
+                  <div class="card-section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                  </div>
+                  <h2 class="card-section-title">Dosage &amp; Administration</h2>
+                </div>
+              </div>
+
+              <div class="dosage-subgrid">
+                <div class="dosage-pill-item">
+                  <div class="dpi-title">Adult Dose</div>
+                  <div class="dpi-val" id="dash-dosage-adult">500mg - 1000mg</div>
+                </div>
+                <div class="dosage-pill-item">
+                  <div class="dpi-title">Max Daily Dose</div>
+                  <div class="dpi-val" id="dash-dosage-max">4000mg per day</div>
+                </div>
+                <div class="dosage-pill-item">
+                  <div class="dpi-title">Food Intake</div>
+                  <div class="dpi-val" id="dash-dosage-food">With or without food</div>
+                </div>
+              </div>
+
+              <div class="dosage-desc-row">
+                <strong>Administration Details:</strong> <span id="dash-dosage-desc">Take one or two tablets every 4 to 6 hours as needed. Do not exceed the maximum daily allowance to avoid liver hazard.</span>
+              </div>
+            </div>
+
+            <!-- Side Effects (Common vs Serious split) -->
+            <div class="grid-card dashboard-grid-section" id="sec-side-effects">
+              <div class="card-section-header">
+                <div class="card-title-wrap">
+                  <div class="card-section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  </div>
+                  <h2 class="card-section-title">Possible Side Effects</h2>
+                </div>
+              </div>
+
+              <div class="side-effects-split">
+                <!-- Common side effects -->
+                <div class="se-severity-column">
+                  <div class="severity-label-bar common">
+                    <span>Common &amp; Mild</span>
+                  </div>
+                  <ul class="icon-list warning-bullets" id="dash-common-se-list">
+                    <li>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                      <span>Nausea or digestive upset</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Serious side effects -->
+                <div class="se-severity-column">
+                  <div class="severity-label-bar serious">
+                    <span>Serious (Seek medical care)</span>
+                  </div>
+                  <ul class="icon-list danger-bullets" id="dash-serious-se-list">
+                    <li>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                      <span>Severe skin allergic reaction (blistering/rash)</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
 
             <!-- Warnings -->
-            <div class="result-section" id="section-warnings">
-              <div class="section-header sh--warning">
-                <span class="sh-icon">🛑</span>
-                <span class="sh-title">Warnings &amp; Precautions</span>
+            <div class="grid-card dashboard-grid-section" id="sec-warnings">
+              <div class="card-section-header">
+                <div class="card-title-wrap">
+                  <div class="card-section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </div>
+                  <h2 class="card-section-title">Critical Warnings &amp; Contraindications</h2>
+                </div>
               </div>
-              <ul class="warn-list" id="warn-list"></ul>
+              <ul class="icon-list danger-bullets" id="dash-warnings-list">
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  <span>Severe liver damage risk if exceeding daily max dose</span>
+                </li>
+              </ul>
             </div>
 
-            <!-- Drug Interactions -->
-            <div class="result-section" id="section-interactions">
-              <div class="section-header sh--teal">
-                <span class="sh-icon">⇄</span>
-                <span class="sh-title">Drug Interactions</span>
+            <!-- Interactions & Alternatives -->
+            <div class="grid-card dashboard-grid-section" id="sec-interactions">
+              <div class="card-section-header">
+                <div class="card-title-wrap">
+                  <div class="card-section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="16 3 21 3 21 8"></polyline>
+                      <line x1="4" y1="20" x2="21" y2="3"></line>
+                      <polyline points="21 16 21 21 16 21"></polyline>
+                      <line x1="15" y1="15" x2="21" y2="21"></line>
+                      <line x1="4" y1="4" x2="9" y2="9"></line>
+                    </svg>
+                  </div>
+                  <h2 class="card-section-title">Substance Interactions &amp; Alternatives</h2>
+                </div>
               </div>
-              <div class="tag-cloud" id="interactions-tags"></div>
+
+              <div style="margin-bottom: 1.5rem;">
+                <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">Known Drug / Food Interactions</h3>
+                <div class="tag-flex-wrap" id="dash-interactions-tags">
+                  <span class="tag-badge teal">Alcohol</span>
+                  <span class="tag-badge teal">Warfarin</span>
+                </div>
+              </div>
+
+              <div>
+                <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">Suggested Alternatives</h3>
+                <div class="tag-flex-wrap" id="dash-alternatives-tags">
+                  <span class="tag-badge indigo">Ibuprofen</span>
+                  <span class="tag-badge indigo">Naproxen</span>
+                </div>
+              </div>
             </div>
 
-            <!-- Alternatives -->
-            <div class="result-section" id="section-alternatives">
-              <div class="section-header sh--indigo">
-                <span class="sh-icon">↔</span>
-                <span class="sh-title">Alternatives</span>
+            <!-- Safety Parameters Grid -->
+            <div class="grid-card dashboard-grid-section" id="sec-safety">
+              <div class="card-section-header">
+                <div class="card-title-wrap">
+                  <div class="card-section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                  </div>
+                  <h2 class="card-section-title">Safety &amp; Pregnancy Advisories</h2>
+                </div>
               </div>
-              <div class="tag-cloud" id="alternatives-tags"></div>
+
+              <div class="safety-parameters-list">
+                <div class="safety-param-card">
+                  <div class="sp-icon">🤰</div>
+                  <div class="sp-info">
+                    <span class="sp-title">Pregnancy Safety</span>
+                    <span class="sp-val" id="dash-safety-pregnancy">Category B — Generally safe under supervision</span>
+                  </div>
+                </div>
+
+                <div class="safety-param-card">
+                  <div class="sp-icon">🍼</div>
+                  <div class="sp-info">
+                    <span class="sp-title">Breastfeeding Safety</span>
+                    <span class="sp-val" id="dash-safety-breastfeeding">Secreted in small quantities; consult doctor</span>
+                  </div>
+                </div>
+
+                <div class="safety-param-card">
+                  <div class="sp-icon">🍺</div>
+                  <div class="sp-info">
+                    <span class="sp-title">Alcohol Interaction</span>
+                    <span class="sp-val" id="dash-safety-alcohol">Avoid. Increases liver toxicity risk</span>
+                  </div>
+                </div>
+
+                <div class="safety-param-card">
+                  <div class="sp-icon">🚗</div>
+                  <div class="sp-info">
+                    <span class="sp-title">Driving &amp; Machinery</span>
+                    <span class="sp-val" id="dash-safety-driving">Does not affect driving concentration</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Medical Disclaimer -->
-            <div class="disclaimer-bar">
-              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
-              <span>This is AI-generated information for educational purposes only. Always consult a qualified medical professional before taking any medication.</span>
+            <!-- Storage & Overdose Handling -->
+            <div class="grid-card dashboard-grid-section" id="sec-storage">
+              <div class="card-section-header">
+                <div class="card-title-wrap">
+                  <div class="card-section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    </svg>
+                  </div>
+                  <h2 class="card-section-title">Storage &amp; Overdose Guidance</h2>
+                </div>
+              </div>
+
+              <div class="safety-parameters-list">
+                <div class="safety-param-card">
+                  <div class="sp-icon">🌡️</div>
+                  <div class="sp-info">
+                    <span class="sp-title">Storage Recommendation</span>
+                    <span class="sp-val" id="dash-storage-val">Store at room temperature below 30°C. Protect from moisture.</span>
+                  </div>
+                </div>
+
+                <div class="safety-param-card">
+                  <div class="sp-icon">🚨</div>
+                  <div class="sp-info">
+                    <span class="sp-title">Overdose Protocol</span>
+                    <span class="sp-val" id="dash-overdose-val">Seek immediate emergency medical attention. Early symptoms include nausea and vomiting.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="dosage-desc-row" style="margin-top: 1.5rem; background-color: var(--warning-bg); border-color: var(--warning);">
+                <strong>Missed Dose:</strong> <span id="dash-missed-dose-val">Take the dose as soon as you remember, unless it is close to the next scheduled dose. Never double doses.</span>
+              </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="grid-card dashboard-grid-section" id="sec-faq">
+              <div class="card-section-header">
+                <div class="card-title-wrap">
+                  <div class="card-section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </div>
+                  <h2 class="card-section-title">Frequently Asked Questions</h2>
+                </div>
+              </div>
+
+              <div class="faq-grid" id="dash-faq-list">
+                <div class="faq-card-item">
+                  <div class="fci-question">Can I take this medicine long term?</div>
+                  <div class="fci-answer">Only if explicitly recommended by your doctor. Daily use over prolonged periods may damage internal organs.</div>
+                </div>
+              </div>
             </div>
 
           </div>
         </div>
+      </section>
 
-        <!-- Error State -->
-        <div class="error-state hidden" id="error-state">
-          <div class="error-icon">✕</div>
-          <h3 class="error-title">Analysis Failed</h3>
-          <p class="error-msg" id="error-msg">An unexpected error occurred.</p>
-          <button class="btn-retry" id="btn-retry">Try Again</button>
+      <!-- ===================================================
+           VIEW 5: ERROR PAGE (ERROR RECOVERY)
+           =================================================== -->
+      <section id="view-error" class="app-view hidden">
+        <div class="error-container">
+          <div class="error-graphic">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </div>
+          <h2 class="error-title">Analysis Interrupted</h2>
+          <p class="error-desc" id="error-message-text">We were unable to process the medicine request. This might be due to a network timeout or invalid API keys on the server.</p>
+
+          <div class="error-recovery-actions">
+            <button class="btn-secondary" id="btn-error-home">Back to Home</button>
+            <button class="btn-primary" id="btn-error-retry">Retry Process</button>
+          </div>
         </div>
-
       </section>
 
     </main>
+
+    <!-- ── FOOTER DISCLAIMER ──────────────────────────────── -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <div class="footer-top">
+          <div class="footer-left">
+            <div class="footer-brand">Drug<span class="footer-logo-tag">FX</span></div>
+            <p class="footer-desc">AI-powered medicine intelligence. Empowering consumers and professionals with quick label summaries, RAG context validation, and side-effect profiling.</p>
+          </div>
+
+          <div class="footer-links-grid">
+            <div class="footer-link-group">
+              <span class="flg-title">Product</span>
+              <a href="#" class="flg-link footer-nav-home-trigger">Search Home</a>
+              <a href="#how-it-works-section" class="flg-link">How it Works</a>
+            </div>
+            <div class="footer-link-group">
+              <span class="flg-title">Information</span>
+              <a href="#features-section" class="flg-link">Platform Features</a>
+              <a href="#faq-section" class="flg-link">FAQ Accordion</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-disclaimer-box">
+          DrugFX is an AI system using Retrieval-Augmented Generation. While built for medical reference, it is for educational purposes only. Always consult a qualified medical professional, nurse, or pharmacist before starting, changing, or stopping any medication.
+          <p style="margin-top: 0.5rem;">&copy; 2026 DrugFX. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
   </div>
 
+  <!-- Main JavaScript Controller -->
   <script src="/static/app.js"></script>
 </body>
 </html>
